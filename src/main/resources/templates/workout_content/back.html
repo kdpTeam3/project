@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" type="text/css" th:href="@{/bootstrap.min.css}">
+    <!-- sbb CSS -->
+    <link rel="stylesheet" type="text/css" th:href="@{/style.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/custom.css}">
+    <title>Title</title>
+
+</head>
+<body>
+<nav th:replace="~{navbar :: navbarFragment}"></nav>
+<nav th:replace="~{second_navbar :: second_navbarFragment}"></nav>
+<nav th:replace="~{/workout_navbar/third_navbar_back :: third_navbar_backFragment}"></nav>
+
+<script th:src="@{/popper.min.js}"></script> <!-- Popper.js 추가 -->
+<script th:src="@{/bootstrap.min.js}"></script> <!-- Bootstrap JS 추가 -->
+</body>
+</html>

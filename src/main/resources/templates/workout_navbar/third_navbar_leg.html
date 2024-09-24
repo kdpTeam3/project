@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/style.css">
+
+  <title>운동</title>
+</head>
+<body>
+<nav th:fragment="third_navbar_legFragment">
+  <ul class="nav nav-tabs" id="legTab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="squat-tab" data-bs-toggle="tab" data-bs-target="#squat-pane"
+              type="button" role="tab" aria-controls="squat-pane" aria-selected="true">스쿼트
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="leg-extension-tab" data-bs-toggle="tab" data-bs-target="#leg-extension-pane"
+              type="button" role="tab" aria-controls="leg-extension-pane" aria-selected="false">레그 익스텐션
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="leg-curl-tab" data-bs-toggle="tab" data-bs-target="#leg-curl-pane"
+              type="button" role="tab" aria-controls="leg-curl-pane" aria-selected="false">레그 컬
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="stiff-deadlift-tab" data-bs-toggle="tab" data-bs-target="#stiff-deadlift-pane"
+              type="button" role="tab" aria-controls="stiff-deadlift-pane" aria-selected="false">스티프 데드리프트
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="lunges-tab" data-bs-toggle="tab" data-bs-target="#lunges-pane"
+              type="button" role="tab" aria-controls="lunges-pane" aria-selected="false">런지
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="leg-press-tab" data-bs-toggle="tab" data-bs-target="#leg-press-pane"
+              type="button" role="tab" aria-controls="leg-press-pane" aria-selected="false">레그 프레스
+      </button>
+    </li>
+  </ul>
+  <div class="tab-content" id="legTabContent">
+    <div class="tab-pane fade show active" id="squat-pane" role="tabpanel" aria-labelledby="squat-tab">
+      스쿼트
+    </div>
+    <div class="tab-pane fade" id="leg-extension-pane" role="tabpanel" aria-labelledby="leg-extension-tab">
+      레그 익스텐션
+    </div>
+    <div class="tab-pane fade" id="leg-curl-pane" role="tabpanel" aria-labelledby="leg-curl-tab">
+      레그 컬
+    </div>
+    <div class="tab-pane fade" id="stiff-deadlift-pane" role="tabpanel" aria-labelledby="stiff-deadlift-tab">
+      스티프 데드리프트
+    </div>
+    <div class="tab-pane fade" id="lunges-pane" role="tabpanel" aria-labelledby="lunges-tab">
+      런지
+    </div>
+    <div class="tab-pane fade" id="leg-press-pane" role="tabpanel" aria-labelledby="leg-press-tab">
+      레그 프레스
+    </div>
+  </div>
+</nav>
+
+<!-- JavaScript Bundle with Popper -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.8/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

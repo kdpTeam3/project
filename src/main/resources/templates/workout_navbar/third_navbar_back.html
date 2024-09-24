@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/style.css">
+
+  <title>운동</title>
+</head>
+<body>
+<nav th:fragment="third_navbar_backFragment">
+  <ul class="nav nav-tabs" id="myTab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="dead-lift-tab" data-bs-toggle="tab" data-bs-target="#dead-lift-tab-pane"
+              type="button" role="tab" aria-controls="dead-lift-tab-pane" aria-selected="true">데드 리프트
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="barbell-row-tab" data-bs-toggle="tab" data-bs-target="#barbell-row-tab-pane"
+              type="button" role="tab" aria-controls="barbell-row-tab-pane" aria-selected="false">바벨 로우
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="dumbbell-row-tab" data-bs-toggle="tab" data-bs-target="#dumbbell-row-tab-pane"
+              type="button" role="tab" aria-controls="dumbbell-row-tab-pane" aria-selected="false">덤벨 로우
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="lat-pull-down-tab" data-bs-toggle="tab" data-bs-target="#lat-pull-down-tab-pane"
+              type="button" role="tab" aria-controls="lat-pull-down-tab-pane" aria-selected="false">랫풀 다운
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="arm-pull-down-tab" data-bs-toggle="tab" data-bs-target="#arm-pull-down-tab-pane"
+              type="button" role="tab" aria-controls="arm-pull-down-tab-pane" aria-selected="false">암풀 다운
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="pull-up-fly-tab" data-bs-toggle="tab" data-bs-target="#pull-up-tab-pane"
+              type="button" role="tab" aria-controls="pull-up-tab-pane" aria-selected="false">풀 업
+      </button>
+    </li>
+  </ul>
+
+  <div class="tab-content" id="myTabContent">
+    <div class="tab-pane fade show active" id="dead-lift-tab-pane" role="tabpanel" aria-labelledby="dead-lift-tab">
+      데드 리프트
+    </div>
+    <div class="tab-pane fade" id="barbell-row-tab-pane" role="tabpanel" aria-labelledby="barbell-row-tab">
+      바벨 로우
+    </div>
+    <div class="tab-pane fade" id="dumbbell-row-tab-pane" role="tabpanel" aria-labelledby="dumbbell-row-tab">
+      덤벨 로우
+    </div>
+    <div class="tab-pane fade" id="lat-pull-down-tab-pane" role="tabpanel" aria-labelledby="lat-pull-down-tab">
+      랫 풀 다운
+    </div>
+    <div class="tab-pane fade" id="arm-pull-down-tab-pane" role="tabpanel" aria-labelledby="arm-pull-down-tab">
+      암 풀 다운
+    </div>
+    <div class="tab-pane fade" id="pull-up-tab-pane" role="tabpanel" aria-labelledby="pull-up-tab">
+      풀 업
+    </div>
+  </div>
+</nav>
+
+<!-- JavaScript Bundle with Popper -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.8/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

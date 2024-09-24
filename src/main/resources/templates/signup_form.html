@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" type="text/css" th:href="@{/bootstrap.min.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/style.css}">
+    <title>회원가입</title>
+</head>
+<body>
+    <!-- 네비게이션 바 -->
+    <nav th:replace="~{navbar :: navbarFragment}"></nav>
+
+    <div class="container my-3">
+        <div class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+            <div class="card shadow-lg p-4" style="width: 400px;">
+                <h4 class="card-title text-center mb-4">회원가입</h4>
+                <form th:action="@{/user/signup}" th:object="${userCreateForm}" method="post">
+                    <div th:replace="~{form_errors :: formErrorsFragment}"></div>
+                    <div class="mb-3">
+                        <label for="username" class="form-label">사용자</label>
+                        <input type="text" th:field="*{username}" class="form-control" id="username">
+                    </div>
+                    <div class="mb-3">
+                        <label for="password1" class="form-label">비밀번호</label>
+                        <input type="password" th:field="*{password1}" class="form-control" id="password1">
+                    </div>
+                    <div class="mb-3">
+                        <label for="password2" class="form-label">비밀번호 확인</label>
+                        <input type="password" th:field="*{password2}" class="form-control" id="password2">
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">이메일</label>
+                        <input type="email" th:field="*{email}" class="form-control" id="email">
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">회원 가입</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 스크립트 추가 -->
+    <script th:src="@{/popper.min.js}"></script>
+    <script th:src="@{/bootstrap.min.js}"></script>
+</body>
+</html>

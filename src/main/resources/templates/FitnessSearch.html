@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>카카오 지도 검색</title>
+        <!-- 카카오 지도 API 사용 -->
+        <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=4da040eab87f2357a9dd38898d9ba6bf&libraries=services,places"></script>
+        <link rel="stylesheet" th:href="@{/bootstrap.min.css}" />
+        <!-- Bootstrap CSS 경로 확인 -->
+        <style>
+            #map {
+                width: 70%; /* 지도의 가로 크기를 70%로 설정 */
+                height: 400px; /* 지도의 세로 높이를 400px로 설정 */
+                float: left; /* 지도를 왼쪽으로 배치 */
+            }
+            #list {
+                width: 30%; /* 검색 결과 목록의 가로 크기를 30%로 설정 */
+                height: 400px; /* 검색 결과 목록의 세로 높이를 400px로 설정 */
+                overflow-y: auto; /* 스크롤 가능하게 설정 */
+                float: left; /* 검색 결과 목록을 왼쪽으로 배치 */
+            }
+            .list-item {
+                padding: 10px; /* 검색 결과 목록의 아이템에 패딩 적용 */
+                border-bottom: 1px solid #ccc; /* 아이템 간 구분선 설정 */
+            }
+        </style>
+    </head>
+    <body>
+        <!-- 내비게이션 바 -->
+        <nav th:replace="~{navbar :: navbarFragment}"></nav>
+
+        <!-- 지도 및 검색 결과 영역 -->
+        <div id="map"></div>
+        <div id="list"></div>
+
+        <!-- 검색 폼 -->
+        <form id="search-form">
+            <input type="text" id="address-input" placeholder="지역을 입력하세요" class="form-control" style="width: 200px; display: inline-block" />
+            <button type="submit" class="btn btn-primary">검색</button>
+        </form>
+
+        <!-- Popper.js 및 Bootstrap JS CDN 사용 -->
+        <script th:src="@{/popper.min.js}"></script>
+        <script th:src="@{/bootstrap.min.js}"></script>
+
+        <script>
+            // 카카오 지도 객체 생성 및 초기 설정
+            var map = new kakao.maps.Map(document.getElementById("map"), {
+                center: new kakao.maps.LatLng(37.54699, 127.09598), // 지도의 초기 중심 좌표 설정
+                level: 5, // 지도 확대 수준 설정
+            });
+
+            // 카카오 장소 검색 서비스 객체 생성
+            var ps = new kakao.maps.services.Places();
+            // 인포윈도우 객체 생성 (마커 클릭 시 정보 표시용)
+            var infowindow = new kakao.maps.InfoWindow({ zIndex: 1 });
+            var markers = []; // 마커 객체들을 저장할 배열
+
+            // 마커 이미지 배열 (번호가 붙은 마커 이미지)
+            var markerImages = [];
+            for (var i = 1; i <= 15; i++) {
+                // 번호가 붙은 마커 이미지 URL과 크기 및 오프셋 설정
+                markerImages.push(
+                    new kakao.maps.MarkerImage(
+                        `https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png`, // 번호별 이미지 URL
+                        new kakao.maps.Size(36, 37), // 이미지 크기 설정
+                        { offset: new kakao.maps.Point(13, 37) } // 이미지 오프셋 설정
+                    )
+                );
+            }
+
+            // 검색 폼 제출 시 이벤트 처리
+            document.getElementById("search-form").addEventListener("submit", function (event) {
+                event.preventDefault(); // 폼 기본 제출 이벤트 방지
+                var keyword = document.getElementById("address-input").value; // 입력된 검색어 가져오기
+                searchPlaces(keyword); // 장소 검색 함수 호출
+            });
+
+            // 장소 검색 함수
+            function searchPlaces(keyword) {
+                if (!keyword.trim()) {
+                    alert("키워드를 입력해주세요!"); // 키워드가 비어있을 경우 경고창 표시
+                    return;
+                }
+                // '헬스장'과 검색어를 결합하여 장소 검색 실행
+                ps.keywordSearch(keyword + " 헬스장", placesSearchCB);
+            }
+
+            // 장소 검색 결과 처리 콜백 함수
+            function placesSearchCB(data, status, pagination) {
+                if (status === kakao.maps.services.Status.OK) {
+                    displayPlaces(data); // 검색 결과를 화면에 표시
+                } else {
+                    alert("검색 결과가 없습니다."); // 검색 실패 시 경고창 표시
+                }
+            }
+
+            // 장소 및 마커를 지도에 표시하는 함수
+            function displayPlaces(places) {
+                var listEl = document.getElementById("list");
+                listEl.innerHTML = ""; // 기존 검색 결과 초기화
+                var bounds = new kakao.maps.LatLngBounds(); // 지도 범위 객체 생성
+
+                // 기존 마커 제거
+                for (var i = 0; i < markers.length; i++) {
+                    markers[i].setMap(null); // 지도에서 마커 제거
+                }
+                markers = []; // 마커 배열 초기화
+
+                // 최대 15개의 장소만 표시
+                for (var i = 0; i < places.length && i < 15; i++) {
+                    var placePosition = new kakao.maps.LatLng(places[i].y, places[i].x); // 장소의 좌표 설정
+                    var marker = addMarker(placePosition, i); // 마커 생성 및 지도에 추가
+                    markers.push(marker); // 마커 배열에 추가
+                    bounds.extend(placePosition); // 지도의 범위 확장
+
+                    // 검색 결과 목록에 헬스장 정보 표시
+                    var itemEl = document.createElement("div");
+                    itemEl.className = "list-item";
+                    itemEl.innerHTML = `<h5>${places[i].place_name}</h5>
+                                    <p>${places[i].address_name}</p>
+                                    <p>${places[i].phone}</p>`;
+                    listEl.appendChild(itemEl);
+
+                    // 검색 결과 아이템 클릭 시 해당 장소의 인포윈도우 표시
+                    (function (marker, place) {
+                        itemEl.onclick = function () {
+                            displayInfowindow(marker, place);
+                        };
+                    })(marker, places[i]);
+                }
+
+                // 검색된 장소들이 모두 보이도록 지도 범위 설정
+                map.setBounds(bounds);
+            }
+
+            // 마커를 지도에 추가하는 함수
+            function addMarker(position, idx) {
+                var marker = new kakao.maps.Marker({
+                    position: position, // 마커 위치 설정
+                    image: markerImages[idx], // 번호가 붙은 마커 이미지 설정
+                });
+                marker.setMap(map); // 마커를 지도에 추가
+                return marker;
+            }
+
+            // 인포윈도우 표시 함수
+            function displayInfowindow(marker, place) {
+                var content = `<div style="padding:5px;z-index:1;">${place.place_name}</div>`;
+                infowindow.setContent(content); // 인포윈도우 내용 설정
+                infowindow.open(map, marker); // 마커에 인포윈도우 표시
+            }
+        </script>
+    </body>
+</html>
