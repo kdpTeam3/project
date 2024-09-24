@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" type="text/css" th:href="@{/bootstrap.min.css}">
+    <!-- sbb CSS -->
+    <link rel="stylesheet" type="text/css" th:href="@{/style.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/custom.css}">
+    <title>음식 추천 시스템</title>
+</head>
+<body>
+    <nav th:replace="~{navbar :: navbarFragment}"></nav>
+    <script th:src="@{/popper.min.js}"></script> <!-- Popper.js 추가 -->
+    <script th:src="@{/bootstrap.min.js}"></script> <!-- Bootstrap JS 추가 -->
+
+    <h1>음식 추천 시스템</h1>
+    
+    <!-- 사용자 ID 제출 폼 -->
+    <form action="/food/recommend" method="post">
+        <input type="hidden" id="user_id" name="user_id" th:value="${#authentication.name}">
+        <button type="submit">추천 요청</button>
+    </form>
+
+    <!-- 추천 결과 출력 -->
+    <h2>추천 결과</h2>
+    <div th:if="${recommendations != null}">
+        <h3>점심 추천</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>음식명</th>
+                    <th>칼로리</th>
+                    <th>탄수화물</th>
+                    <th>단백질</th>
+                    <th>지방</th>
+                    <th>회사명</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- 점심 추천 항목을 출력 -->
+                <tr th:each="lunchItem : ${recommendations.lunch}">
+                    <td th:text="${lunchItem.food_name}"></td>
+                    <td th:text="${lunchItem.kcal}"></td>
+                    <td th:text="${lunchItem.carb}"></td>
+                    <td th:text="${lunchItem.protein}"></td>
+                    <td th:text="${lunchItem.fat}"></td>
+                    <td th:text="${lunchItem.company}"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>저녁 추천</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>음식명</th>
+                    <th>칼로리</th>
+                    <th>탄수화물</th>
+                    <th>단백질</th>
+                    <th>지방</th>
+                    <th>회사명</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- 저녁 추천 항목을 출력 -->
+                <tr th:each="dinnerItem : ${recommendations.dinner}">
+                    <td th:text="${dinnerItem.food_name}"></td>
+                    <td th:text="${dinnerItem.kcal}"></td>
+                    <td th:text="${dinnerItem.carb}"></td>
+                    <td th:text="${dinnerItem.protein}"></td>
+                    <td th:text="${dinnerItem.fat}"></td>
+                    <td th:text="${dinnerItem.company}"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 평점 제출 폼 -->
+    <form action="/food/submit_rating" method="post" th:if="${recommendations != null}">
+        <!-- 사용자 ID 유지 -->
+        <input type="hidden" id="hidden_user_id" name="user_id" th:value="${user_id}">
+        
+        <h3>점심 추천에 대한 평점:</h3>
+        <div th:each="lunchItem : ${recommendations.lunch}">
+            <label th:text="${lunchItem.food_name}"></label>
+            <!-- 숨겨진 필드로 음식 코드와 음식 번호를 전송 -->
+            <input type="hidden" name="lunch_food_code[]" th:value="${lunchItem.food_code}">
+            <input type="hidden" name="lunch_food_number[]" th:value="${lunchItem.food_number}">
+            <select name="lunch_rating[]">
+                <option value="1">매우 불만족</option>
+                <option value="2">불만족</option>
+                <option value="3">보통</option>
+                <option value="4">만족</option>
+                <option value="5">매우 만족</option>
+            </select>
+            <br>
+        </div>
+        
+        <h3>저녁 추천에 대한 평점:</h3>
+        <div th:each="dinnerItem : ${recommendations.dinner}">
+            <label th:text="${dinnerItem.food_name}"></label>
+            <!-- 숨겨진 필드로 음식 코드와 음식 번호를 전송 -->
+            <input type="hidden" name="dinner_food_code[]" th:value="${dinnerItem.food_code}">
+            <input type="hidden" name="dinner_food_number[]" th:value="${dinnerItem.food_number}">
+            <select name="dinner_rating[]">
+                <option value="1">매우 불만족</option>
+                <option value="2">불만족</option>
+                <option value="3">보통</option>
+                <option value="4">만족</option>
+                <option value="5">매우 만족</option>
+            </select>
+            <br>
+        </div>
+
+        <button type="submit">평점 제출</button>
+    </form>
+    
+</body>
+</html>

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>음식 카테고리 선택</title>
+</head>
+<body>
+    <h1>음식 카테고리를 선택해주세요</h1>
+    
+    <form action="/food/submit_preferences" method="post">
+        <input type="hidden" name="user_id" value="${user_id}">
+        <div>
+            <label><input type="checkbox" name="food_codes" value="1"> 밥류</label><br>
+            <label><input type="checkbox" name="food_codes" value="2"> 면류</label><br>
+            <label><input type="checkbox" name="food_codes" value="3"> 과자류</label><br>
+            <!-- 나머지 19개의 음식 카테고리 추가 -->
+        </div>
+        <button type="submit">선호 카테고리 저장</button>
+    </form>
+</body>
+</html>
