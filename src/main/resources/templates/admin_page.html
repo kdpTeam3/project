@@ -1,29 +1,41 @@
 <html layout:decorate="~{layout}">
-<div layout:fragment="content" class="container my-3">
-    <h2>관리자 페이지</h2>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Username</th>
-                <th>Email</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr th:each="user : ${users}">
-                <td th:text="${user.id}"></td>
-                <td th:text="${user.username}"></td>
-                <td th:text="${user.email}"></td>
-                <td>
-                    <form th:action="@{/manage/user/delete/{id}(id=${user.id})}" method="post" style="display: inline;">
-                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                    </form>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-    <a th:href="@{/manage/question/list}" class="btn btn-primary">질문 관리</a>
-    <a th:href="@{/manage/answer/list}" class="btn btn-primary">답변 관리</a>
-</div>
+    <div layout:fragment="content" class="container my-3">
+        <h2>관리자 페이지</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="user : ${users}">
+                    <td th:text="${user.id}"></td>
+                    <td th:text="${user.username}"></td>
+                    <td th:text="${user.email}"></td>
+                    <td>
+                        <form
+                            th:action="@{/manage/user/delete/{id}(id=${user.id})}"
+                            method="post"
+                            style="display: inline"
+                            onsubmit="return confirmDelete(this);"
+                        >
+                            <input type="hidden" name="username" th:value="${user.username}" />
+                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <a th:href="@{/manage/question/list}" class="btn btn-primary">질문 관리</a>
+        <a th:href="@{/manage/answer/list}" class="btn btn-primary">답변 관리</a>
+        <script th:inline="javascript">
+            function confirmDelete(form) {
+                var username = form.querySelector('input[name="username"]').value;
+                return confirm("유저명 " + username + " 을(를) 삭제하시겠습니까?");
+            }
+        </script>
+    </div>
 </html>

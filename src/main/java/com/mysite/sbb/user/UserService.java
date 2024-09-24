@@ -43,6 +43,16 @@ public class UserService {
         return siteUser.orElse(null); // 사용자 정보를 찾지 못하면 null을 반환
     }
 
+    public SiteUser getUserById(Long id) {
+        Optional<SiteUser> siteUser = this.userRepository.findById(id);
+        if (siteUser.isPresent()) {
+            System.out.println("User found: " + siteUser.get().getUsername());
+        } else {
+            System.out.println("User not found with id: " + id);
+        }
+        return siteUser.orElse(null);
+    }
+
     public SiteUser findByUsername(String username) {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found: " + username));
