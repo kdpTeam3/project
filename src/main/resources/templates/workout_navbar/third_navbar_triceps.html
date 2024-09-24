@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/style.css">
+
+  <title>운동</title>
+</head>
+<body>
+<nav th:fragment="third_navbar_tricepsFragment">
+  <ul class="nav nav-tabs" id="tricepsTab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="close-grip-bench-press-tab" data-bs-toggle="tab" data-bs-target="#close-grip-bench-press-pane"
+              type="button" role="tab" aria-controls="close-grip-bench-press-pane" aria-selected="true">클로즈 그립 벤치 프레스
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="lying-triceps-extension-tab" data-bs-toggle="tab" data-bs-target="#lying-triceps-extension-pane"
+              type="button" role="tab" aria-controls="lying-triceps-extension-pane" aria-selected="false">라잉 트라이셉스 익스텐션
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="dumbbell-overhead-extension-tab" data-bs-toggle="tab" data-bs-target="#dumbbell-overhead-extension-pane"
+              type="button" role="tab" aria-controls="dumbbell-overhead-extension-pane" aria-selected="false">덤벨 오버헤드 익스텐션
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="triceps-pushdown-tab" data-bs-toggle="tab" data-bs-target="#triceps-pushdown-pane"
+              type="button" role="tab" aria-controls="triceps-pushdown-pane" aria-selected="false">트라이셉스 푸시다운
+      </button>
+    </li>
+  </ul>
+  <div class="tab-content" id="tricepsTabContent">
+    <div class="tab-pane fade show active" id="close-grip-bench-press-pane" role="tabpanel" aria-labelledby="close-grip-bench-press-tab">
+      클로즈 그립 벤치 프레스
+    </div>
+    <div class="tab-pane fade" id="lying-triceps-extension-pane" role="tabpanel" aria-labelledby="lying-triceps-extension-tab">
+      라잉 트라이셉스 익스텐션
+    </div>
+    <div class="tab-pane fade" id="dumbbell-overhead-extension-pane" role="tabpanel" aria-labelledby="dumbbell-overhead-extension-tab">
+      덤벨 오버헤드 익스텐션
+    </div>
+    <div class="tab-pane fade" id="triceps-pushdown-pane" role="tabpanel" aria-labelledby="triceps-pushdown-tab">
+      트라이셉스 푸시다운
+    </div>
+  </div>
+</nav>
+
+<!-- JavaScript Bundle with Popper -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.8/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

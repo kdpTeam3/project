@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>운동 세트 관리</title>
+        <link rel="stylesheet" type="text/css" th:href="@{/bootstrap.min.css}" />
+        <link rel="stylesheet" type="text/css" th:href="@{/style.css}" />
+        <link rel="stylesheet" type="text/css" th:href="@{/make_routine.css}" />
+    </head>
+
+    <body>
+        <!-- 네비게이션 바 -->
+        <nav th:replace="~{navbar :: navbarFragment}"></nav>
+
+        <!-- 메인 콘텐츠 -->
+        <div class="container mt-5">
+            <h1>새로운 루틴 만들기</h1>
+            <form id="routine-form" action="/workout/make_routine" method="post" th:action="@{/workout/make_routine}" th:object="${routineUpdateDto}">
+                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+
+                <!--운동 컨테이너-->
+                <div id="workout-container"></div>
+
+                <button type="button" class="btn btn-primary" onclick="showWorkoutModal()">운동 추가</button>
+                <input type="submit" class="btn btn-success mt-3" value="저장" onclick="confirmRoutineName()" />
+            </form>
+        </div>
+
+        <!-- 운동 선택 모달 -->
+        <div class="modal fade" id="workoutModal" tabindex="-1" aria-labelledby="workoutModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="workoutModalLabel">운동 선택</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- 탭 메뉴 -->
+                        <ul class="nav nav-tabs" id="workoutTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button
+                                    class="nav-link active"
+                                    id="chest-tab"
+                                    data-bs-toggle="tab"
+                                    data-bs-target="#chest"
+                                    type="button"
+                                    role="tab"
+                                    aria-controls="chest"
+                                    aria-selected="true"
+                                >
+                                    가슴 운동
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button
+                                    class="nav-link"
+                                    id="shoulders-tab"
+                                    data-bs-toggle="tab"
+                                    data-bs-target="#shoulders"
+                                    type="button"
+                                    role="tab"
+                                    aria-controls="shoulders"
+                                    aria-selected="false"
+                                >
+                                    어깨 운동
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button
+                                    class="nav-link"
+                                    id="abs-tab"
+                                    data-bs-toggle="tab"
+                                    data-bs-target="#abs"
+                                    type="button"
+                                    role="tab"
+                                    aria-controls="abs"
+                                    aria-selected="false"
+                                >
+                                    복근 운동
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button
+                                    class="nav-link"
+                                    id="legs-tab"
+                                    data-bs-toggle="tab"
+                                    data-bs-target="#legs"
+                                    type="button"
+                                    role="tab"
+                                    aria-controls="legs"
+                                    aria-selected="false"
+                                >
+                                    다리 운동
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button
+                                    class="nav-link"
+                                    id="back-tab"
+                                    data-bs-toggle="tab"
+                                    data-bs-target="#back"
+                                    type="button"
+                                    role="tab"
+                                    aria-controls="back"
+                                    aria-selected="false"
+                                >
+                                    등 운동
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button
+                                    class="nav-link"
+                                    id="biceps-tab"
+                                    data-bs-toggle="tab"
+                                    data-bs-target="#biceps"
+                                    type="button"
+                                    role="tab"
+                                    aria-controls="biceps"
+                                    aria-selected="false"
+                                >
+                                    이두 운동
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button
+                                    class="nav-link"
+                                    id="triceps-tab"
+                                    data-bs-toggle="tab"
+                                    data-bs-target="#triceps"
+                                    type="button"
+                                    role="tab"
+                                    aria-controls="triceps"
+                                    aria-selected="false"
+                                >
+                                    삼두 운동
+                                </button>
+                            </li>
+                        </ul>
+
+                        <!-- 탭 콘텐츠 -->
+                        <div class="tab-content mt-3" id="workoutTabContent">
+                            <div class="tab-pane fade active" id="chest" role="tabpanel" aria-labelledby="chest-tab">
+                                <select id="chestWorkoutSelect" class="form-select">
+                                    <option value="펙덱 플라이">펙덱 플라이</option>
+                                    <option value="덤벨 벤치 프레스">덤벨 벤치 프레스</option>
+                                    <option value="체스트 프레스 머신">체스트 프레스 머신</option>
+                                    <option value="벤치프레스">벤치프레스</option>
+                                    <option value="덤벨 플라이">덤벨 플라이</option>
+                                    <option value="인클라인 벤치프레스">인클라인 벤치프레스</option>
+                                </select>
+                            </div>
+
+                            <div class="tab-pane fade" id="shoulders" role="tabpanel" aria-labelledby="shoulders-tab">
+                                <select id="shouldersWorkoutSelect" class="form-select">
+                                    <option value="덤벨 숄더 프레스">덤벨 숄더 프레스</option>
+                                    <option value="덤벨 레터럴 레이즈">덤벨 레터럴 레이즈</option>
+                                    <option value="숄더프레스 머신">숄더프레스 머신</option>
+                                    <option value="벤트 오버 레터럴 레이즈">벤트 오버 레터럴 레이즈</option>
+                                    <option value="덤벨 프론트 레이즈">덤벨 프론트 레이즈</option>
+                                </select>
+                            </div>
+
+                            <div class="tab-pane fade" id="abs" role="tabpanel" aria-labelledby="abs-tab">
+                                <select id="absWorkoutSelect" class="form-select">
+                                    <option value="레그 레이즈">레그 레이즈</option>
+                                    <option value="크런치">크런치</option>
+                                </select>
+                            </div>
+
+                            <div class="tab-pane fade" id="legs" role="tabpanel" aria-labelledby="legs-tab">
+                                <select id="legsWorkoutSelect" class="form-select">
+                                    <option value="레그 익스텐션">레그 익스텐션</option>
+                                    <option value="레그 컬">레그 컬</option>
+                                    <option value="레그 프레스">레그 프레스</option>
+                                    <option value="바벨 스쿼트">바벨 스쿼트</option>
+                                    <option value="데드리프트">데드리프트</option>
+                                    <option value="바벨 스티프 레드 데드리프트">바벨 스티프 레드 데드리프트</option>
+                                    <option value="런지">런지</option>
+                                </select>
+                            </div>
+
+                            <div class="tab-pane fade" id="back" role="tabpanel" aria-labelledby="back-tab">
+                                <select id="backWorkoutSelect" class="form-select">
+                                    <option value="시티드 케이블 로우">시티드 케이블 로우</option>
+                                    <option value="바벨 로우">바벨 로우</option>
+                                    <option value="암 풀다운">암 풀다운</option>
+                                    <option value="풀 업">풀 업</option>
+                                    <option value="페이스 풀">페이스 풀</option>
+                                    <option value="티바 로우">티바 로우</option>
+                                </select>
+                            </div>
+
+                            <div class="tab-pane fade" id="biceps" role="tabpanel" aria-labelledby="biceps-tab">
+                                <select id="bicepsWorkoutSelect" class="form-select">
+                                    <option value="덤벨 바이셉 컬">덤벨 바이셉 컬</option>
+                                    <option value="덤벨 해머 컬">덤벨 해머 컬</option>
+                                    <option value="바벨 바이셉 컬">바벨 바이셉 컬</option>
+                                </select>
+                            </div>
+
+                            <div class="tab-pane fade" id="triceps" role="tabpanel" aria-labelledby="triceps-tab">
+                                <select id="tricepsWorkoutSelect" class="form-select">
+                                    <option value="케이블 트라이셉 푸쉬다운">케이블 트라이셉 푸쉬다운</option>
+                                    <option value="라잉 트라이셉 익스텐션">라잉 트라이셉 익스텐션</option>
+                                    <option value="딥스">딥스</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                            <button type="button" class="btn btn-primary" onclick="confirmWorkout()">확인</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 스크립트 -->
+        <script>
+            let workoutCount = 0;
+
+            // 모달 생성
+            function showWorkoutModal() {
+                const workoutModal = new bootstrap.Modal(document.getElementById("workoutModal"));
+                workoutModal.show();
+            }
+
+            // 선택한 운동 추가
+            function confirmWorkout() {
+                // 현재 활성화된 탭 확인
+                const activeTab = document.querySelector(".nav-tabs .active");
+                const activeTabId = activeTab.getAttribute("data-bs-target").substring(1); // '#chest' -> 'chest'
+
+                // 활성화된 탭에 따른 select ID 설정
+                const selectedWorkout = document.getElementById(`${activeTabId}WorkoutSelect`).value;
+
+                workoutCount++;
+                const container = document.getElementById("workout-container");
+                const newGroup = createWorkoutGroup(workoutCount, selectedWorkout);
+                container.appendChild(newGroup);
+                addSet(workoutCount); // 초기 세트 추가
+                const workoutModal = bootstrap.Modal.getInstance(document.getElementById("workoutModal"));
+                workoutModal.hide();
+            }
+
+            // 루틴 이름 입력받기
+            function validateInput(input, type) {
+                const value = input.value.trim();
+                if (
+                    value === "" ||
+                    (type === "weight" && (isNaN(value) || parseFloat(value) <= 0)) ||
+                    (type === "reps" && (isNaN(value) || parseInt(value, 10) <= 0))
+                ) {
+                    alert(`${type === "weight" ? "무게" : "횟수"} 입력 값이 올바르지 않습니다. 양수를 입력하세요.`);
+                    input.focus();
+                    return false;
+                }
+                return true;
+            }
+
+            function confirmRoutineName() {
+                const workoutGroups = document.querySelectorAll(".workout-group");
+
+                for (let i = 0; i < workoutGroups.length; i++) {
+                    const setRows = workoutGroups[i].querySelectorAll(".set-row");
+
+                    for (let j = 0; j < setRows.length; j++) {
+                        const weightInput = setRows[j].querySelector(`input[name="workouts[${i}].workoutSet[${j}].weight"]`);
+                        const repsInput = setRows[j].querySelector(`input[name="workouts[${i}].workoutSet[${j}].reps"]`);
+
+                        console.log("test");
+                        console.log(`weightInput name: workouts[${i}].workoutSet[${j}].weight`, weightInput);
+                        console.log(`repsInput name: workouts[${i}].workoutSet[${j}].reps`, repsInput);
+                    }
+                }
+
+                const routineName = prompt("루틴의 이름을 입력하세요");
+                if (routineName) {
+                    const routineNameInput = document.createElement("input");
+                    routineNameInput.type = "hidden";
+                    routineNameInput.name = "routine_name";
+                    routineNameInput.value = routineName;
+                    document.getElementById("routine-form").appendChild(routineNameInput);
+                    return true; // 폼 제출
+                } else {
+                    alert("루틴 이름을 입력해야 합니다.");
+                    return false; // 폼 제출 방지
+                }
+            }
+
+            // 운동 그룹 생성
+            function createWorkoutGroup(workoutId, selectedWorkout) {
+                const newGroup = document.createElement("div");
+                newGroup.classList.add("workout-group");
+                newGroup.innerHTML = `
+        <div class="workout-header" style="display: flex; align-items: center;">
+            <div class="workout-title" style="margin-right: auto;">${selectedWorkout}</div>
+            <input type="hidden" name="workouts[${workoutId - 1}].workout_name" value="${selectedWorkout}"/>
+            <button type="button" class="btn btn-danger btn-remove" onclick="removeWorkout(this)">x</button>
+        </div>
+        <div class="set-header set-row">
+            <div style="width: 100px;">세트</div>
+            <div style="width: 100px;">중량</div>
+            <div style="width: 100px;">횟수</div>
+            <div style="width: 100px;"></div>
+        </div>
+        <div class="set-container"></div>
+        <button type="button" class="btn btn-link btn-add" onclick="addSet(${workoutId})">세트 추가</button>
+    `;
+                return newGroup;
+            }
+
+            // 운동 제거
+            function removeWorkout(button) {
+                workoutCount--;
+                const workoutGroup = button.parentElement.parentElement; // 버튼의 부모 요소인 운동 그룹을 가져옴
+                workoutGroup.remove(); // 운동 그룹 제거
+            }
+
+            // 세트 추가
+            function addSet(workoutId) {
+                const setContainer = document.querySelector(`#workout-container .workout-group:nth-child(${workoutId}) .set-container`);
+
+                if (!setContainer) {
+                    console.error("setContainer가 없습니다. workoutId:", workoutId);
+                    return;
+                }
+
+                const setRow = createSetRow(workoutId - 1, setContainer.children.length + 1); // workoutId - 1 사용
+                setContainer.appendChild(setRow);
+            }
+
+            // 세트 행 생성
+
+            function createSetRow(workoutId, setNumber) {
+                const setRow = document.createElement("div");
+                setRow.classList.add("set-row");
+                setRow.innerHTML = `
+        <div style="width: 100px;">${setNumber}</div>
+        <input type="number" class="form-control" name="workouts[${workoutId}].workoutSet[${
+                    setNumber - 1
+                }].weight" placeholder="kg" style="width: 100px; text-align: right;">
+        <input type="number" class="form-control" name="workouts[${workoutId}].workoutSet[${
+                    setNumber - 1
+                }].reps" placeholder="회" style="width: 100px; text-align: right;">
+        <button type="button" class="btn btn-danger btn-remove" onclick="removeSet(this)">세트 제거</button>
+    `;
+                return setRow;
+            }
+
+            // 세트 삭제
+            function removeSet(button) {
+                const setRow = button.parentElement; // 버튼의 부모 요소인 세트 행을 가져옴
+                const setContainer = setRow.parentElement; // 세트 행의 부모 요소인 세트 컨테이너를 가져옴
+                setRow.remove(); // 세트 행 제거
+                updateSetNumbers(setContainer); // 남아 있는 세트의 번호 업데이트
+            }
+
+            // 세트 번호 업데이트
+            function updateSetNumbers(setContainer) {
+                const setRows = setContainer.querySelectorAll(".set-row");
+                setRows.forEach((row, index) => {
+                    row.querySelector("div").textContent = index + 1; // 세트 번호 업데이트
+                });
+            }
+        </script>
+
+        <!-- Popper.js 및 Bootstrap JS 추가 -->
+        <script th:src="@{/popper.min.js}"></script>
+        <script th:src="@{/bootstrap.min.js}"></script>
+    </body>
+</html>

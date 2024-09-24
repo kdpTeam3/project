@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+    <!--  Required meta tags -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width , initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" type="text/css" th:href="@{/bootstrap.min.css}">
+    <!-- sbb CSS -->
+    <link rel="stylesheet" type="text/css" th:href="@{/style.css}">
+    <title>Fitness</title>
+</head>
+
+<body>
+
+<!-- 내비게이션 바 -->
+<nav th:replace="~{navbar :: navbarFragment}"></nav>
+
+<h1>나의 루틴</h1>
+<button type="button" onclick="location.href='/workout/make_routine'">+</button>
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col">
+            <div class="list-group">
+
+                <div class="list-group-item" th:each="routine : ${routines}">
+                    <h5 class="mb-1" th:text="${routine.routine_name}">루틴 이름</h5>
+                    <div th:each="workout : ${routine.workouts}">
+                        <p class="mb-1"
+                           th:text="${workout.workout_name} + ' x ' + ${workout.workoutSet.size()}">운동 이름 x 세트
+                            수</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JQuery -->
+<!-- Popper.js 및 Bootstrap JS -->
+<script th:src="@{/popper.min.js}"></script> <!-- Popper.js 추가 -->
+<script th:src="@{/bootstrap.min.js}"></script> <!-- Bootstrap JS 추가 -->
+
+</body>
+
+</html>

@@ -1,0 +1,19 @@
+textarea{
+	width:100%;	/* 텍스트 창의 넓이를 설정함 */
+}
+
+input[type=submit]{
+	
+	margin-top: 10xp; /* 버튼 상단의 마진을 설정함 */
+}
+
+table{
+	border: black solid 2px;
+
+}
+table tr{
+	border: black solid 2px;
+}
+table tr td{
+	padding-right: 20px;
+}

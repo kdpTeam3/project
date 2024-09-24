@@ -1,0 +1,238 @@
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <title>Title</title>-->
+<!--    &lt;!&ndash; Bootstrap CSS &ndash;&gt;-->
+<!--    <link rel="stylesheet" type="text/css" th:href="@{/bootstrap.min.css}">-->
+<!--    &lt;!&ndash; sbb CSS &ndash;&gt;-->
+<!--    <link rel="stylesheet" type="text/css" th:href="@{/style.css}">-->
+<!--    <link rel="stylesheet" type="text/css" th:href="@{/custom.css}">-->
+<!--    <style>-->
+<!--        .input-container {-->
+<!--            margin-top: 10px;-->
+<!--        }-->
+<!--        .workoutContent {-->
+<!--            display: none; /* 기본적으로 숨김 */-->
+<!--        }-->
+<!--        .workoutContent.active {-->
+<!--            display: block; /* active 클래스가 붙으면 보이게 */-->
+<!--        }-->
+<!--    </style>-->
+<!--</head>-->
+<!--<body>-->
+<!--&lt;!&ndash; 네비게이션 바 &ndash;&gt;-->
+<!--<nav th:replace="~{navbar :: navbarFragment}"></nav>-->
+<!--<h1>루틴 만들기</h1>-->
+
+<!--<label for="workoutDays">일주일에 몇 번 운동 하나요?</label>-->
+<!--<form action="">-->
+<!--    <select name="days" id="workoutDays">-->
+<!--        <option value="1">1 번</option>-->
+<!--        <option value="2">2 번</option>-->
+<!--        <option value="3">3 번</option>-->
+<!--        <option value="4">4 번</option>-->
+<!--        <option value="5">5 번</option>-->
+<!--        <option value="6">6 번</option>-->
+<!--        <option value="7">7 번</option>-->
+<!--    </select>-->
+<!--</form>-->
+
+<!--<button onclick="createInputs()">생성</button>-->
+
+<!--<div id="inputsContainer" class="input-container"></div>-->
+
+<!--&lt;!&ndash; Bootstrap 모달 HTML 추가 &ndash;&gt;-->
+<!--<div class="modal fade" id="workoutModal" tabindex="-1" role="dialog" aria-labelledby="workoutModalLabel" aria-hidden="true">-->
+<!--    <div class="modal-dialog" role="document">-->
+<!--        <div class="modal-content">-->
+<!--            <div class="modal-header">-->
+<!--                <h5 class="modal-title" id="workoutModalLabel">운동 추가하기</h5>-->
+<!--                <button type="button" class="close" data-dismiss="modal" aria-label="Close">-->
+<!--                    <span aria-hidden="true">&times;</span>-->
+<!--                </button>-->
+<!--            </div>-->
+
+<!--            <div class="modal-body">-->
+<!--                &lt;!&ndash; 운동 범주 버튼 &ndash;&gt;-->
+<!--                <button class="workoutTab btn btn-secondary" data-category="chest">가슴</button>-->
+<!--                <button class="workoutTab btn btn-secondary" data-category="triceps">삼두</button>-->
+<!--                <button class="workoutTab btn btn-secondary" data-category="back">등</button>-->
+<!--                <button class="workoutTab btn btn-secondary" data-category="biceps">이두</button>-->
+<!--                <button class="workoutTab btn btn-secondary" data-category="legs">하체</button>-->
+<!--                <button class="workoutTab btn btn-secondary" data-category="shoulders">어깨</button>-->
+<!--                <button class="workoutTab btn btn-secondary" data-category="abs">복근</button>-->
+
+<!--                &lt;!&ndash; 운동 버튼들 &ndash;&gt;-->
+<!--                <button class="workoutContent btn btn-info" data-category="chest">펙덱 플라이</button>-->
+<!--                <button class="workoutContent btn btn-info" data-category="chest">덤벨 벤치 프레스</button>-->
+<!--                <button class="workoutContent btn btn-info" data-category="chest">체스트 프레스 머신</button>-->
+<!--                <button class="workoutContent btn btn-info" data-category="shoulders">덤벨 숄더 프레스</button>-->
+<!--                <button class="workoutContent btn btn-info" data-category="abs">레그 레이즈</button>-->
+<!--                <button class="workoutContent btn btn-info" data-category="legs">레그 익스텐션</button>-->
+<!--                <button class="workoutContent btn btn-info" data-category="shoulders">덤벨 레터럴 레이즈</button>-->
+<!--                <button class="workoutContent btn btn-info" data-category="legs">레그 컬</button>-->
+<!--                <button class="workoutContent btn btn-info" data-category="chest">벤치 프레스</button>-->
+<!--                <button class="workoutContent btn btn-info" data-category="back">시티드 케이블 로우</button>-->
+<!--                <button class="workoutContent btn btn-info" data-category="legs">레그 프레스</button>-->
+<!--                <button class="workoutContent btn btn-info" data-category="biceps">덤벨 바이셉 컬</button>-->
+<!--                <button class="workoutContent btn btn-info" data-category="triceps">케이블 트라이셉 푸쉬다운</button>-->
+<!--                <button class="workoutContent btn btn-info" data-category="shoulders">숄더프레스 머신</button>-->
+<!--                <button class="workoutContent btn btn-info" data-category="legs">바벨 스쿼트</button>-->
+<!--                <button class="workoutContent btn btn-info" data-category="back">바벨 로우</button>-->
+<!--                <button class="workoutContent btn btn-info" data-category="legs">데드리프트</button>-->
+<!--                <button class="workoutContent btn btn-info" data-category="biceps">덤벨 해머 컬</button>-->
+<!--                <button class="workoutContent btn btn-info" data-category="triceps">라잉 트라이셉 익스텐션</button>-->
+<!--                <button class="workoutContent btn btn-info" data-category="back">암 풀다운</button>-->
+<!--                <button class="workoutContent btn btn-info" data-category="back">풀 업</button>-->
+<!--                <button class="workoutContent btn btn-info" data-category="biceps">바벨 바이셉 컬</button>-->
+<!--                <button class="workoutContent btn btn-info" data-category="shoulders">벤트 오버 레터럴 레이즈</button>-->
+<!--                <button class="workoutContent btn btn-info" data-category="shoulders">덤벨 프론트 레이즈</button>-->
+<!--                <button class="workoutContent btn btn-info" data-category="legs">바벨 스티프 레드 데드리프트</button>-->
+<!--                <button class="workoutContent btn btn-info" data-category="chest">덤벨 플라이</button>-->
+<!--                <button class="workoutContent btn btn-info" data-category="chest">인클라인 벤치프레스</button>-->
+<!--                <button class="workoutContent btn btn-info" data-category="abs">크런치</button>-->
+<!--                <button class="workoutContent btn btn-info" data-category="back">페이스 풀</button>-->
+<!--                <button class="workoutContent btn btn-info" data-category="back">티바 로우</button>-->
+<!--                <button class="workoutContent btn btn-info" data-category="legs">런지</button>-->
+<!--                <button class="workoutContent btn btn-info" data-category="triceps">딥스</button>-->
+<!--            </div>-->
+<!--            <div class="modal-footer">-->
+<!--                <button type="button" class="btn btn-secondary" data-dismiss="modal">닫기</button>-->
+<!--                <button type="button" class="btn btn-primary">저장</button>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
+
+<!--<script>-->
+<!--    // 필터링 기능을 처리하는 함수-->
+<!--    document.querySelectorAll('.workoutTab').forEach(button => {-->
+<!--        button.addEventListener('click', () => {-->
+<!--            const category = button.getAttribute('data-category');-->
+
+<!--            // 모든 운동 버튼 숨김-->
+<!--            document.querySelectorAll('.workoutContent').forEach(content => {-->
+<!--                content.classList.remove('active');-->
+<!--            });-->
+
+<!--            // 선택한 범주에 해당하는 운동 버튼만 보이게-->
+<!--            document.querySelectorAll(`.workoutContent[data-category="${category}"]`).forEach(content => {-->
+<!--                content.classList.add('active');-->
+<!--            });-->
+<!--        });-->
+<!--    });-->
+
+<!--    function createInputs() {-->
+<!--        const num = document.getElementById('workoutDays').value;-->
+<!--        const container = document.getElementById('inputsContainer');-->
+
+<!--        // 기존 입력창 제거-->
+<!--        container.innerHTML = '';-->
+
+<!--        // 입력창 생성-->
+<!--        for (let i = 0; i < num; i++) {-->
+<!--            const div = document.createElement('div');-->
+<!--            div.innerText = `DAY ${i + 1}`;-->
+
+<!--            // 모달 창을 호출할 버튼-->
+<!--            const button = document.createElement('button');-->
+<!--            button.innerText = '운동 추가하기';-->
+<!--            button.className = 'btn btn-primary';-->
+<!--            button.setAttribute('data-toggle', 'modal');-->
+<!--            button.setAttribute('data-target', '#workoutModal');-->
+
+<!--            container.appendChild(div);-->
+<!--            container.appendChild(button);-->
+<!--        }-->
+<!--    }-->
+<!--</script>-->
+
+<!--&lt;!&ndash; Bootstrap JS 및 Popper.js 추가 &ndash;&gt;-->
+
+<!--<script th:src="@{/popper.min.js}"></script> &lt;!&ndash; Popper.js 추가 &ndash;&gt;-->
+<!--<script th:src="@{/bootstrap.min.js}"></script> &lt;!&ndash; Bootstrap JS 추가 &ndash;&gt;-->
+<!--</body>-->
+<!--</html>-->
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Title</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" type="text/css" th:href="@{/bootstrap.min.css}">
+    <!-- sbb CSS -->
+    <link rel="stylesheet" type="text/css" th:href="@{/style.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/custom.css}">
+    <style>
+        .input-container {
+            margin-top: 10px;
+        }
+
+        .workoutContent {
+            display: none; /* 기본적으로 숨김 */
+        }
+
+        .workoutContent.active {
+            display: block; /* active 클래스가 붙으면 보이게 */
+        }
+    </style>
+</head>
+<body>
+<!-- 네비게이션 바 -->
+<nav th:replace="~{navbar :: navbarFragment}"></nav>
+<h1>루틴 만들기</h1>
+
+<label for="workoutDays">일주일에 몇 번 운동 하나요?</label>
+<form action="">
+    <select name="days" id="workoutDays">
+        <option value="1">1 번</option>
+        <option value="2">2 번</option>
+        <option value="3">3 번</option>
+        <option value="4">4 번</option>
+        <option value="5">5 번</option>
+        <option value="6">6 번</option>
+        <option value="7">7 번</option>
+    </select>
+</form>
+
+<button onclick="createInputs()">생성</button>
+
+<div id="inputsContainer" class="input-container"></div>
+
+
+<script>
+
+
+    function createInputs() {
+        const num = document.getElementById('workoutDays').value;
+        const container = document.getElementById('inputsContainer');
+
+        // 기존 입력창 제거
+        container.innerHTML = '';
+
+        // 입력창 생성
+        for (let i = 0; i < num; i++) {
+            const div = document.createElement('div');
+            div.innerText = `DAY ${i + 1}`;
+
+
+            container.appendChild(div);
+        }
+    }
+</script>
+
+<!-- Bootstrap JS 및 Popper.js 추가 -->
+
+<script th:src="@{/popper.min.js}"></script> <!-- Popper.js 추가 -->
+<script th:src="@{/bootstrap.min.js}"></script> <!-- Bootstrap JS 추가 -->
+</body>
+</html>
+
+
+
+

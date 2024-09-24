@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" type="text/css" th:href="@{/bootstrap.min.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/style.css}">
+    <title>나만의 운동 파트너 찾기</title>
+</head>
+<body>
+    <!-- 네비게이션 바 -->
+    <nav th:replace="~{navbar :: navbarFragment}"></nav>
+    
+    <div th:utext="${matchingForm}"></div>
+    
+    <div id="matchResults"></div>
+    <div id="loadingIndicator" style="display: none;">잠시만 기다려주세요!</div>
+
+    <script th:src="@{/popper.min.js}"></script>
+    <script th:src="@{/bootstrap.min.js}"></script>
+    <script>
+        document.addEventListener('submit', function(e) {
+            if (e.target.action.includes('/match')) {
+                e.preventDefault();
+                
+                const formData = new FormData(e.target);
+                const loadingIndicator = document.getElementById('loadingIndicator');
+                const matchResults = document.getElementById('matchResults');
+                
+                loadingIndicator.style.display = 'block';
+                matchResults.innerHTML = '';
+                
+                fetch('http://localhost:8000/match', {
+                    method: 'POST',
+                    body: formData,
+                    mode: 'cors'
+                })
+                .then(response => response.text())
+                .then(html => {
+                    matchResults.innerHTML = html;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    matchResults.innerHTML = '<p>Error fetching matches. Please try again. Error details: ' + error.message + '</p>';
+                })
+                .finally(() => {
+                    loadingIndicator.style.display = 'none';
+                });
+            }
+        });
+    </script>
+</body>
+</html>
