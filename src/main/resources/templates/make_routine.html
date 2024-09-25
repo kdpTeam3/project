@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -206,7 +206,7 @@
               </div>
 
               <div class="tab-pane fade" id="back" role="tabpanel" aria-labelledby="back-tab">
-                <ul>
+                <ul id="backWorkoutSelect">
                   <li data-value="랫 풀다운">랫 풀다운</li>
                   <li data-value="암 풀다운">암 풀다운</li>
                   <li data-value="시티드 케이블 로우">시티드 케이블 로우</li>
@@ -245,7 +245,7 @@
               </div>
 
               <div class="tab-pane fade" id="abs" role="tabpanel" aria-labelledby="abs-tab">
-                <ul>
+                <ul id="absWorkoutSelect">
                   <li data-value="레그 레이즈">레그 레이즈</li>
                   <li data-value="크런치">크런치</li>
                   <li data-value="시티드 니업">시티드 니업</li>
@@ -257,7 +257,7 @@
               </div>
 
               <div class="tab-pane fade" id="legs" role="tabpanel" aria-labelledby="legs-tab">
-                <ul>
+                <ul id="legsWorkoutSelect">
                   <li data-value="바벨 스쿼트">바벨 스쿼트</li>
                   <li data-value="스미스 머신 스쿼트">스미스 머신 스쿼트</li>
                   <li data-value="핵 스쿼트 머신">핵 스쿼트 머신</li>
@@ -274,7 +274,7 @@
               </div>
 
               <div class="tab-pane fade" id="biceps" role="tabpanel" aria-labelledby="biceps-tab">
-                <ul>
+                <ul id="bicepsWorkoutSelect">
                   <li data-value="덤벨 바이셉 컬">덤벨 바이셉 컬</li>
                   <li data-value="바벨 바이셉 컬">바벨 바이셉 컬</li>
                   <li data-value="덤벨 해머 컬">덤벨 해머 컬</li>
@@ -290,7 +290,7 @@
               </div>
 
               <div class="tab-pane fade" id="triceps" role="tabpanel" aria-labelledby="triceps-tab">
-                <ul>
+                <ul id="tricepsWorkoutSelect">
                   <li data-value="케이블 트라이셉 푸쉬다운">케이블 트라이셉 푸쉬다운</li>
                   <li data-value="라잉 트라이셉 익스텐션">라잉 트라이셉 익스텐션</li>
                   <li data-value="벤치 딥스">벤치 딥스</li>
@@ -314,7 +314,7 @@
     </div>
 
     <!-- 스크립트 -->
-    <script>
+    <script th:inline="javascript">
       let selectedWorkout = null; // 선택한 운동
       let workoutId = 0;
 
@@ -374,35 +374,69 @@
       // 운동 그룹 생성
       function createWorkoutGroup(workoutId, selectedWorkout) {
         const newGroup = document.createElement('div');
-        newGroup.classList.add('workout-group', workoutId);
+        newGroup.classList.add('workout-group');
+        newGroup.id = `workout-group-${workoutId}`;
+        newGroup.setAttribute('data-workout-id', workoutId);
         newGroup.innerHTML = `
-          <div class="workout-header" style="display: flex; align-items: center;">
-              <div class="workout-title" style="margin-right: auto;">${selectedWorkout}</div>
-              <input type="hidden" name="workouts[${workoutId - 1}].workout_name" value="${selectedWorkout}"/>
-              <button type="button" class="btn btn-danger btn-remove" onclick="removeWorkout(this)">x</button>
-          </div>
-          <div class="set-header set-row">
-              <div style="width: 100px;">세트</div>
-              <div style="width: 100px;">중량</div>
-              <div style="width: 100px;">횟수</div>
-              <div style="width: 100px;"></div>
-          </div>
-          <div class="set-container"></div> <!-- 세트 컨테이너 추가 -->
-          <button type="button" class="btn btn-link btn-add" onclick="addSet(this)">세트 추가</button>
-      `;
+            <div class="workout-header" style="display: flex; align-items: center;">
+                <div class="workout-title" style="margin-right: auto;">${selectedWorkout}</div>
+                <input type="hidden" name="workouts[${workoutId - 1}].workout_name" value="${selectedWorkout}"/>
+                <button type="button" class="btn btn-danger btn-remove" onclick="removeWorkout(this)">x</button>
+            </div>
+            <div class="set-header set-row">
+                <div style="width: 100px;">세트</div>
+                <div style="width: 100px;">중량</div>
+                <div style="width: 100px;">횟수</div>
+                <div style="width: 100px;"></div>
+            </div>
+            <div class="set-container"></div> <!-- 세트 컨테이너 추가 -->
+            <button type="button" class="btn btn-link btn-add" onclick="addSet(this)">세트 추가</button>
+        `;
         return newGroup;
       }
 
       // 운동 제거
       function removeWorkout(button) {
-        workoutId--;
         const workoutGroup = button.parentElement.parentElement; // 버튼의 부모 요소인 운동 그룹을 가져옴
+        var workoutGroupId = workoutGroup.getAttribute('data-workout-id');
         workoutGroup.remove(); // 운동 그룹 제거
+        updateWorkoutId(workoutGroupId); // workoutId 갱신
         updateSaveButtonVisibility();
+      }
+
+      // workoutId 갱신
+      function updateWorkoutId(workoutGroupId) {
+        const workoutGroups = document.querySelectorAll('.workout-group');
+        // workout-group-id 업데이트
+        for (let i = 0; i < workoutGroups.length; i++) {
+          const workoutGroup = workoutGroups[i];
+          workoutGroup.setAttribute('data-workout-id', i + 1);
+        }
+        workoutId--;
+      }
+      // workoutInput 갱신
+      function updateWorkoutInput(workoutGroup) {
+        const setRows = workoutGroup.querySelectorAll('.set-row');
+        for (let i = 0; i < setRows.length; i++) {
+          const inputs = setRows[i].querySelectorAll('input');
+          inputs.forEach((input) => {
+            input.name = input.name.replace(/workoutSet\[\d+\]/, `workoutSet[${i - 1}]`);
+          });
+        }
+      }
+
+      // 세트 번호 갱신
+      function updateSetNumbers(setContainer) {
+        const setRows = setContainer.querySelectorAll('.set-row');
+        setRows.forEach((row, index) => {
+          row.querySelector('div').textContent = index + 1; // 세트 번호 업데이트
+        });
       }
 
       // 세트 추가
       function addSet(button) {
+        const workoutGroup = button.closest('.workout-group');
+        const workoutId = workoutGroup.getAttribute('data-workout-id');
         const setContainer = button.previousElementSibling; // set-container를 찾음
 
         if (!setContainer) {
@@ -410,7 +444,7 @@
           return;
         }
 
-        const setRow = createSetRow(workoutId - 1, setContainer.children.length + 1);
+        const setRow = createSetRow(workoutId, setContainer.children.length + 1);
         console.log(workoutId);
         setContainer.appendChild(setRow);
 
@@ -421,24 +455,27 @@
         const setRow = document.createElement('div');
         setRow.classList.add('set-row');
         setRow.innerHTML = `
-        <div style="width: 100px;">${setNumber}</div>
-        <input type="number" class="form-control"  name="workoutSet[${setNumber - 1}].weight" required min="0" placeholder="kg" style="width: 100px; text-align: right;">
-        <input type="number" class="form-control"  name="workoutSet[${setNumber - 1}].reps" required min="0" placeholder="회" style="width: 100px; text-align: right;">
-        <button type="button" class="btn btn-danger btn-remove" onclick="removeSet(this)">세트 제거</button>
-    `;
+          <div style="width: 100px;">${setNumber}</div>
+          <input type="number" class="form-control"  name="workouts[${workoutId - 1}].workoutSet[${setNumber - 1}].weight" required min="0" placeholder="kg" style="width: 100px; text-align: right;">
+          <input type="number" class="form-control"  name="workouts[${workoutId - 1}].workoutSet[${setNumber - 1}].reps" required min="0" placeholder="회" style="width: 100px; text-align: right;">
+          <button type="button" class="btn btn-danger btn-remove" onclick="removeSet(this)">세트 제거</button>
+      `;
         return setRow;
       }
 
-      // 세트 삭제
+      // 세트 제거
       function removeSet(button) {
         const setRow = button.parentElement; // 버튼의 부모 요소인 세트 행을 가져옴
         const setContainer = setRow.parentElement; // 세트 행의 부모 요소인 세트 컨테이너를 가져옴
+        const workoutGroup = button.closest('.workout-group');
+
         setRow.remove(); // 세트 행 제거
         updateSetNumbers(setContainer); // 남아 있는 세트의 번호 업데이트
-        updateSetDeleteButtonVisibility(); // 세트 삭제버튼의 표시 상태 업데이트
+        updateWorkoutInput(workoutGroup);
+        updateSetDeleteButtonVisibility(); // 세트 제거버튼의 표시 상태 업데이트
       }
 
-      // 세트 삭제버튼 표시
+      // 세트 제거버튼 표시
       function updateSetDeleteButtonVisibility() {
         const workoutGroups = document.querySelectorAll('#workout-container .workout-group');
 
