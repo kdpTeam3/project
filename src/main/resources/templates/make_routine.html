@@ -420,6 +420,15 @@
       function updateWorkoutInput(workoutGroup) {
         const setRows = workoutGroup.querySelectorAll('.set-row');
         const dataWorkoutId = workoutGroup.getAttribute('data-workout-id');
+        const workoutHeaders = workoutGroup.querySelectorAll('.workout-header');
+
+        for (let i = 0; i < workoutHeaders.length; i++) {
+          const inputs = workoutHeaders[i].querySelectorAll('input');
+          inputs.forEach((input) => {
+            input.name = input.name.replace(/workouts\[\d+\]/, `workouts[${dataWorkoutId - 1}]`);
+          });
+        }
+
         for (let i = 0; i < setRows.length; i++) {
           const inputs = setRows[i].querySelectorAll('input');
           inputs.forEach((input) => {
@@ -456,7 +465,6 @@
         }
 
         const setRow = createSetRow(workoutId, setContainer.children.length + 1);
-        console.log(workoutId);
         setContainer.appendChild(setRow);
 
         updateSetDeleteButtonVisibility();
@@ -504,32 +512,10 @@
         });
       }
 
-      // 세트 번호 업데이트
-      function updateSetNumbers(setContainer) {
-        const setRows = setContainer.querySelectorAll('.set-row');
-        setRows.forEach((row, index) => {
-          row.querySelector('div').textContent = index + 1; // 세트 번호 업데이트
-        });
-      }
-
       // 루틴 이름 입력받고 저장
       function confirmRoutineName() {
-        const workoutGroups = document.querySelectorAll('.workout-group');
-
-        for (let i = 0; i < workoutGroups.length; i++) {
-          const setRows = workoutGroups[i].querySelectorAll('.set-row');
-
-          for (let j = 0; j < setRows.length; j++) {
-            const weightInput = setRows[j].querySelector(
-              `input[name="workouts[${i}].workoutSet[${j}].weight"]`,
-            );
-
-            const repsInput = setRows[j].querySelector(
-              `input[name="workouts[${i}].workoutSet[${j}].reps"]`,
-            );
-          }
-        }
         const routineName = prompt('루틴의 이름을 입력하세요');
+
         if (routineName) {
           const routineNameInput = document.createElement('input');
           routineNameInput.type = 'hidden';
