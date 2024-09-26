@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -314,7 +314,7 @@
     </div>
 
     <!-- 스크립트 -->
-    <script th:inline="javascript">
+    <script>
       let selectedWorkout = null; // 선택한 운동
       let workoutId = 0;
 
@@ -401,6 +401,7 @@
         var workoutGroupId = workoutGroup.getAttribute('data-workout-id');
         workoutGroup.remove(); // 운동 그룹 제거
         updateWorkoutId(workoutGroupId); // workoutId 갱신
+        updateWorkouts();
         updateSaveButtonVisibility();
       }
 
@@ -411,21 +412,20 @@
         for (let i = 0; i < workoutGroups.length; i++) {
           const workoutGroup = workoutGroups[i];
           workoutGroup.setAttribute('data-workout-id', i + 1);
+          workoutGroup.setAttribute('id', `workout-group-${i + 1}`);
         }
         workoutId--;
       }
-      // workoutInput 갱신
-      function updateWorkoutInput(workoutGroup) {
-        const setRows = workoutGroup.querySelectorAll('.set-row');
-        for (let i = 0; i < setRows.length; i++) {
-          const inputs = setRows[i].querySelectorAll('input');
-          inputs.forEach((input) => {
-            input.name = input.name.replace(/workoutSet\[\d+\]/, `workoutSet[${i - 1}]`);
-          });
-        }
+
+      // workouts 갱신
+      function updateWorkouts() {
+        const setRows = document.querySelectorAll('.set-row');
+
+        setRows.forEach((row, i) => {
+          console.log(row);
+        });
       }
 
-      // 세트 번호 갱신
       function updateSetNumbers(setContainer) {
         const setRows = setContainer.querySelectorAll('.set-row');
         setRows.forEach((row, index) => {
@@ -463,19 +463,17 @@
         return setRow;
       }
 
-      // 세트 제거
+      // 세트 삭제
       function removeSet(button) {
         const setRow = button.parentElement; // 버튼의 부모 요소인 세트 행을 가져옴
         const setContainer = setRow.parentElement; // 세트 행의 부모 요소인 세트 컨테이너를 가져옴
-        const workoutGroup = button.closest('.workout-group');
-
         setRow.remove(); // 세트 행 제거
         updateSetNumbers(setContainer); // 남아 있는 세트의 번호 업데이트
-        updateWorkoutInput(workoutGroup);
-        updateSetDeleteButtonVisibility(); // 세트 제거버튼의 표시 상태 업데이트
+        updateSetDeleteButtonVisibility(); // 세트 삭제버튼의 표시 상태 업데이트
+        updateWorkouts(); // workouts 갱신
       }
 
-      // 세트 제거버튼 표시
+      // 세트 삭제버튼 표시
       function updateSetDeleteButtonVisibility() {
         const workoutGroups = document.querySelectorAll('#workout-container .workout-group');
 

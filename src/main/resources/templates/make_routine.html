@@ -401,6 +401,7 @@
         var workoutGroupId = workoutGroup.getAttribute('data-workout-id');
         workoutGroup.remove(); // 운동 그룹 제거
         updateWorkoutId(workoutGroupId); // workoutId 갱신
+        updateAllWorkoutInputs();
         updateSaveButtonVisibility();
       }
 
@@ -411,18 +412,28 @@
         for (let i = 0; i < workoutGroups.length; i++) {
           const workoutGroup = workoutGroups[i];
           workoutGroup.setAttribute('data-workout-id', i + 1);
+          workoutGroup.setAttribute('id', `workout-group-${i + 1}`);
         }
         workoutId--;
       }
       // workoutInput 갱신
       function updateWorkoutInput(workoutGroup) {
         const setRows = workoutGroup.querySelectorAll('.set-row');
+        const dataWorkoutId = workoutGroup.getAttribute('data-workout-id');
         for (let i = 0; i < setRows.length; i++) {
           const inputs = setRows[i].querySelectorAll('input');
           inputs.forEach((input) => {
             input.name = input.name.replace(/workoutSet\[\d+\]/, `workoutSet[${i - 1}]`);
+            input.name = input.name.replace(/workouts\[\d+\]/, `workouts[${dataWorkoutId - 1}]`);
           });
         }
+      }
+      // 모든 workoutInput 갱신
+      function updateAllWorkoutInputs() {
+        const workoutGroups = document.querySelectorAll('.workout-group');
+        workoutGroups.forEach((workoutGroup) => {
+          updateWorkoutInput(workoutGroup);
+        });
       }
 
       // 세트 번호 갱신
