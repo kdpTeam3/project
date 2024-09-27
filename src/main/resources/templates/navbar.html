@@ -31,7 +31,12 @@
                             영양
                         </button>
                         <ul class="dropdown-menu dropdown-menu-dark">
-                            <li><a class="dropdown-item" href="/food/recommend">식단 추천</a></li>
+                            <li>
+                                <form id="recommendForm" action="/food/check_profile" method="POST">
+                                    <input type="hidden" name="user_id" th:value="${#authentication.name}" />
+                                    <button class="dropdown-item" type="submit">식단 추천</button>
+                                </form>
+                            </li>
                             <li><a class="dropdown-item" href="#">2</a></li>
                         </ul>
                     </li>
