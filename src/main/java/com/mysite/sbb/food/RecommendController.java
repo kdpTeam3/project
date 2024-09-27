@@ -2,10 +2,6 @@ package com.mysite.sbb.food;
 
 import java.util.Map;
 
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,39 +9,29 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.client.RestTemplate;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mysite.sbb.service.RestClientService;
 
 @RequestMapping("/food")
 @Controller
 public class RecommendController {
 
-    private final RestTemplate restTemplate = new RestTemplate();
-    private final String FLASK_BASE_URL = "http://127.0.0.1:5000"; // Flask 서버 주소
+    private final RestClientService restClientService;
 
+    public RecommendController(RestClientService restClientService) {
+        this.restClientService = restClientService;
+    }
 
     // 프로필 여부 확인 후 페이지 리다이렉트
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/check_profile")
     public String checkProfileAndRedirect(@RequestParam("user_id") String userId) {
-        // Flask로 유저 프로필 존재 여부 확인 요청
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        String requestBody = "user_id=" + userId;
-        HttpEntity<String> request = new HttpEntity<>(requestBody, headers);
-
-        ResponseEntity<String> response = restTemplate.postForEntity(FLASK_BASE_URL + "/check_profile", request, String.class);
-
-        // JSON 데이터를 Java Map으로 변환
-        ObjectMapper objectMapper = new ObjectMapper();
         try {
-            Map<String, Object> result = objectMapper.readValue(response.getBody(), new TypeReference<Map<String, Object>>() {});
-            boolean profileExists = (boolean) result.get("profile_exists");
+            String response = restClientService.sendPostRequest("/check_profile", "user_id=" + userId);
+            Map<String, Object> result = restClientService.parseJsonToMap(response);
 
             // 프로필 존재 여부에 따라 페이지 리다이렉트
-            if (profileExists) {
+            if ((boolean) result.get("profile_exists")) {
                 return "redirect:/food/recommend";
             } else {
                 return "redirect:/food/enter_profile";
@@ -66,28 +52,16 @@ public class RecommendController {
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/recommend")
     public String getRecommendations(@RequestParam("user_id") String userId, Model model) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        String requestBody = "user_id=" + userId;
-        HttpEntity<String> request = new HttpEntity<>(requestBody, headers);
-
-        // Flask 서버로 추천 요청
-        ResponseEntity<String> response = restTemplate.postForEntity(FLASK_BASE_URL + "/recommend", request, String.class);
-
-        // JSON 데이터를 Java 객체로 변환
-        ObjectMapper objectMapper = new ObjectMapper();
         try {
-            // JSON을 파싱하여 Map 형태로 변환
-            Map<String, Object> recommendations = objectMapper.readValue(response.getBody(), new TypeReference<Map<String, Object>>() {});
+            String response = restClientService.sendPostRequest("/recommend", "user_id=" + userId);
+            Map<String, Object> recommendations = restClientService.parseJsonToMap(response);
 
-            // 모델에 추천 결과 추가
             model.addAttribute("recommendations", recommendations);
-            model.addAttribute("user_id", userId); // 사용자 ID 추가
+            model.addAttribute("user_id", userId);
         } catch (Exception e) {
             e.printStackTrace(); // 오류 발생 시 처리
         }
-
-        return "food_recommend"; // 추천 결과를 보여주는 페이지로 이동
+        return "food_recommend";
     }
 
     @PostMapping("/submit_rating")
@@ -100,24 +74,32 @@ public class RecommendController {
         @RequestParam("dinner_food_number[]") String[] dinnerFoodNumbers,
         @RequestParam("dinner_rating[]") String[] dinnerRatings) {
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        String requestBody = "user_id=" + userId;
+        String requestBody = buildRatingRequestBody(userId, lunchFoodCodes, lunchFoodNumbers, lunchRatings, dinnerFoodCodes, dinnerFoodNumbers, dinnerRatings);
 
-        for (int i = 0; i < lunchFoodCodes.length; i++) {
-            requestBody += "&lunch_food_code[]=" + lunchFoodCodes[i];
-            requestBody += "&lunch_food_number[]=" + lunchFoodNumbers[i];
-            requestBody += "&lunch_rating[]=" + lunchRatings[i];
-        }
-
-        for (int i = 0; i < dinnerFoodCodes.length; i++) {
-            requestBody += "&dinner_food_code[]=" + dinnerFoodCodes[i];
-            requestBody += "&dinner_food_number[]=" + dinnerFoodNumbers[i];
-            requestBody += "&dinner_rating[]=" + dinnerRatings[i];
-        }
-
-        HttpEntity<String> request = new HttpEntity<>(requestBody, headers);
-        restTemplate.postForEntity(FLASK_BASE_URL + "/submit_rating", request, String.class);
+        restClientService.sendPostRequest("/submit_rating", requestBody);
         return "redirect:/"; // 평점 제출 후 메인 페이지로 리다이렉트
+    }
+
+    // 평점 제출 요청 바디 빌드
+    private String buildRatingRequestBody(String userId, String[] lunchFoodCodes, String[] lunchFoodNumbers, String[] lunchRatings,
+                                          String[] dinnerFoodCodes, String[] dinnerFoodNumbers, String[] dinnerRatings) {
+        StringBuilder requestBody = new StringBuilder("user_id=" + userId);
+
+        appendFoodDetails(requestBody, "lunch_food_code[]", lunchFoodCodes);
+        appendFoodDetails(requestBody, "lunch_food_number[]", lunchFoodNumbers);
+        appendFoodDetails(requestBody, "lunch_rating[]", lunchRatings);
+
+        appendFoodDetails(requestBody, "dinner_food_code[]", dinnerFoodCodes);
+        appendFoodDetails(requestBody, "dinner_food_number[]", dinnerFoodNumbers);
+        appendFoodDetails(requestBody, "dinner_rating[]", dinnerRatings);
+
+        return requestBody.toString();
+    }
+
+    // 식사 정보 추가
+    private void appendFoodDetails(StringBuilder requestBody, String paramName, String[] paramValues) {
+        for (String value : paramValues) {
+            requestBody.append("&").append(paramName).append("=").append(value);
+        }
     }
 }
