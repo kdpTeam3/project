@@ -14,8 +14,10 @@
 
     <!-- 메인 콘텐츠 -->
     <div class="container mt-5">
-      <h1>새로운 루틴 만들기</h1>
-      <button type="button" onclick="location.href='/workout/my_routine'">뒤로가기</button>
+      <div style="display: flex; justify-content: space-between; margin-bottom: 20px">
+        <h1>새로운 루틴 만들기</h1>
+        <button type="button" onclick="location.href='/workout/my_routine'">뒤로가기</button>
+      </div>
       <form
         id="routine-form"
         action="/workout/make_routine"
@@ -380,7 +382,9 @@
         newGroup.innerHTML = `
             <div class="workout-header" style="display: flex; align-items: center;">
                 <div class="workout-title" style="margin-right: auto;">${selectedWorkout}</div>
-                <input type="hidden" name="workouts[${workoutId - 1}].workout_name" value="${selectedWorkout}"/>
+                <input type="hidden" name="workouts[${
+                  workoutId - 1
+                }].workout_name" value="${selectedWorkout}"/>
                 <button type="button" class="btn btn-danger btn-remove" onclick="removeWorkout(this)">x</button>
             </div>
             <div class="set-header set-row">
@@ -416,6 +420,7 @@
         }
         workoutId--;
       }
+
       // workoutInput 갱신
       function updateWorkoutInput(workoutGroup) {
         const setRows = workoutGroup.querySelectorAll('.set-row');
@@ -437,6 +442,7 @@
           });
         }
       }
+
       // 모든 workoutInput 갱신
       function updateAllWorkoutInputs() {
         const workoutGroups = document.querySelectorAll('.workout-group');
@@ -469,14 +475,19 @@
 
         updateSetDeleteButtonVisibility();
       }
+
       // 세트 행 생성
       function createSetRow(workoutId, setNumber) {
         const setRow = document.createElement('div');
         setRow.classList.add('set-row');
         setRow.innerHTML = `
           <div style="width: 100px;">${setNumber}</div>
-          <input type="number" class="form-control"  name="workouts[${workoutId - 1}].workoutSet[${setNumber - 1}].weight" required min="0" placeholder="kg" style="width: 100px; text-align: right;">
-          <input type="number" class="form-control"  name="workouts[${workoutId - 1}].workoutSet[${setNumber - 1}].reps" required min="0" placeholder="회" style="width: 100px; text-align: right;">
+          <input type="number" class="form-control"  name="workouts[${
+            workoutId - 1
+          }].workoutSet[${setNumber - 1}].weight" required min="0" placeholder="kg" style="width: 100px; text-align: right;">
+          <input type="number" class="form-control"  name="workouts[${
+            workoutId - 1
+          }].workoutSet[${setNumber - 1}].reps" required min="0" placeholder="회" style="width: 100px; text-align: right;">
           <button type="button" class="btn btn-danger btn-remove" onclick="removeSet(this)">세트 제거</button>
       `;
         return setRow;

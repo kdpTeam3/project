@@ -6,6 +6,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.util.List;
 
 @Service
@@ -19,8 +20,8 @@ public class RoutineService {
         return routineRepository.save(routine);
     }
 
-    public List<Routine> findByUser(String username){
-        SiteUser user = userService.findByUsername(username); // 사용자를 찾음
-        return routineRepository.findBySiteUser(user); // 해당 사용자의 루틴 목록 반환
-    }
+//   public List<Routine> findByUser(/*String username*/Principal principal){
+////        SiteUser user = userService.findByUsername(username); // 사용자를 찾음
+////        return routineRepository.findRoutinesBySiteUserUsername(principal.getName()); // 해당 사용자의 루틴 목록 반환
+//    }
 }
