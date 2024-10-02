@@ -1,0 +1,65 @@
+/* 네비게이션바 설정 */
+.custom-navbar {
+    background-color: #000000; /* 검은색 배경 */
+    padding: 10px 20px;
+}
+
+.custom-navbar .navbar-brand {
+    font-size: 1.8em;
+    color: #ffffff; /* 로고 색상 흰색 */
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.custom-navbar .navbar-nav .nav-item .custom-btn {
+    color: #ffffff; /* 네비게이션 항목 기본 색상 흰색 */
+    background-color: #000000; /* 배경 검은색 */
+    font-size: 1.1em;
+    font-weight: bold;
+    border: none;
+    margin-left: 15px; /* 각 항목 간 간격 */
+}
+
+.custom-navbar .navbar-nav .nav-item .custom-btn:hover {
+    background-color: #b2ff00; /* 호버 시 강조색 (녹색) */
+    color: #000;
+}
+
+.custom-navbar .navbar-nav .dropdown-menu-dark {
+    background-color: #333333; /* 드롭다운 메뉴 배경 */
+}
+
+.custom-navbar .navbar-nav .dropdown-item {
+    color: #ffffff; /* 드롭다운 항목 텍스트 색상 */
+}
+
+.custom-navbar .navbar-nav .dropdown-item:hover {
+    background-color: #b2ff00; /* 호버 시 녹색 강조 */
+    color: #000;
+}
+
+/* 네비게이션바 전체 정렬 */
+.navbar-nav {
+    display: flex;
+    align-items: center;
+}
+
+.navbar-toggler-icon {
+    filter: invert(1); /* 햄버거 아이콘 색상 반전 */
+}
+
+/* 로그인, 회원가입 스타일 */
+.navbar-nav .nav-link {
+    color: #ffffff; /* 로그인, 회원가입 링크 색상 흰색 */
+    font-weight: bold;
+    margin-left: 20px;
+}
+
+.navbar-nav .nav-link:hover {
+    color: #b2ff00; /* 호버 시 녹색 강조 */
+}
+
+/* 우측에 로그인, 회원가입 배치 */
+.navbar-nav.ms-auto {
+    margin-left: auto;
+}
