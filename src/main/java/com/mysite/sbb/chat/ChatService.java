@@ -1,5 +1,6 @@
 package com.mysite.sbb.chat;
 
+import com.mysite.sbb.user.SiteUser;
 import com.mysite.sbb.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,29 +17,30 @@ public class ChatService {
     private final UserService userService;
 
     // 메시지 저장
-    public void saveMessage(Long senderId, Long receiverId, String content) {
-        ChatMessage chatMessage = new ChatMessage();
-        chatMessage.setSenderId(senderId);
-        chatMessage.setReceiverId(receiverId);
-        chatMessage.setContent(content);
-        chatMessage.setSenderUsername(userService.getUserById(senderId).getUsername());  // 발신자 이름 저장
-        
-        // 서버에서 시간을 기록하는 부분
-        LocalDateTime currentTime = LocalDateTime.now();
-        chatMessage.setSentAt(currentTime);  // 전송 시간 저장
-        
-        chatMessage.setType(ChatMessage.MessageType.CHAT);
-        chatMessageRepository.save(chatMessage);  // 저장
+    public void saveMessage(ChatMessage chatMessage) {
+        if (chatMessage.getSender() != null) {
+            chatMessage.setSenderUsername(chatMessage.getSender().getUsername());
+        }
+        chatMessage.setSentAt(LocalDateTime.now());
+        chatMessageRepository.save(chatMessage);
     }
 
-    // 채팅 기록 가져오기
-    public List<ChatMessage> getChatHistory(Long senderId, Long receiverId) {
-        // 발신자-수신자와 수신자-발신자 간의 모든 메시지를 조회하여 결합 후, 시간순으로 정렬
-        List<ChatMessage> chatHistory = chatMessageRepository.findBySenderIdAndReceiverId(senderId, receiverId);
-        chatHistory.addAll(chatMessageRepository.findBySenderIdAndReceiverId(receiverId, senderId));
-        
+    public List<ChatMessage> getChatHistory(SiteUser sender, SiteUser receiver) {
+        List<ChatMessage> chatHistory = chatMessageRepository.findBySenderAndReceiver(sender, receiver);
+        chatHistory.addAll(chatMessageRepository.findBySenderAndReceiver(receiver, sender));
+
         return chatHistory.stream()
                 .sorted((m1, m2) -> m1.getSentAt().compareTo(m2.getSentAt()))
+                .peek(this::ensureSenderUsername)
                 .collect(Collectors.toList());
+    }
+
+    private void ensureSenderUsername(ChatMessage message) {
+        if (message.getSenderUsername() == null || message.getSenderUsername().isEmpty()) {
+            if (message.getSender() != null) {
+                message.setSenderUsername(message.getSender().getUsername());
+                chatMessageRepository.save(message);
+            }
+        }
     }
 }

@@ -1,108 +1,239 @@
 <!DOCTYPE html>
 <html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
     <title>실시간 채팅</title>
-    <link rel="stylesheet" type="text/css" th:href="@{/bootstrap.min.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/bootstrap.min.css}" />
     <script src="https://cdn.jsdelivr.net/sockjs/1.1.4/sockjs.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
-</head>
-<body>
+    <style>
+      #message-form {
+        display: flex;
+        align-items: center;
+      }
+      #message {
+        flex-grow: 1;
+        margin-right: 10px;
+      }
+      #send-button {
+        width: 100px;
+        height: 38px;
+      }
+      .message-date {
+        text-align: center;
+        margin: 10px 0;
+        font-weight: bold;
+        color: #6c757d;
+      }
+      .message-content {
+        margin-bottom: 5px;
+      }
+      .message-time {
+        font-size: 0.8em;
+        color: #6c757d;
+      }
+    </style>
+  </head>
+  <body>
     <nav th:replace="~{navbar :: navbarFragment}"></nav>
     <div class="container my-5">
-        <h4>채팅방 - <span th:text="${receiverUsername}"></span></h4> <!-- 상대방 이름 표시 -->
-        <div id="chat-box" class="border p-3 mb-3" style="height: 300px; overflow-y: scroll;">
-            <div th:each="message : ${chatHistory}">
-                <div th:if="${message.senderId} == ${sender.id}" class="d-flex justify-content-start">
-                    <div class="alert alert-primary">
-                        <strong th:text="${message.senderUsername}"></strong>:
-                        <span th:text="${message.content}"></span>
-                        <small th:text="${#temporals.format(message.sentAt, 'yyyy-MM-dd HH:mm')}"></small>
-                    </div>
-                </div>
-                <div th:if="${message.senderId} != ${sender.id}" class="d-flex justify-content-end">
-                    <div class="alert alert-secondary">
-                        <strong th:text="${message.senderUsername}"></strong>:
-                        <span th:text="${message.content}"></span>
-                        <small th:text="${#temporals.format(message.sentAt, 'yyyy-MM-dd HH:mm')}"></small>
-                    </div>
-                </div>
+      <h4>채팅방 - <span th:text="${receiver.username}"></span></h4>
+      <div
+        id="chat-box"
+        class="border p-3 mb-3"
+        style="height: 300px; overflow-y: scroll"
+      >
+        <div th:each="message : ${chatHistory}">
+          <div
+            th:if="${message.sender.id} == ${sender.id}"
+            class="d-flex justify-content-end mb-2"
+          >
+            <div>
+              <strong
+                th:text="${message.senderUsername}"
+                class="d-block text-end"
+              ></strong>
+              <div
+                class="alert alert-primary"
+                style="
+                  background-color: #d1e7ff;
+                  border-radius: 15px;
+                  padding: 10px;
+                "
+              >
+                <span th:text="${message.content}"></span><br />
+                <span
+                  class="message-time"
+                  th:text="${#temporals.format(message.sentAt, 'HH:mm')}"
+                ></span>
+              </div>
             </div>
+          </div>
+          <div
+            th:if="${message.sender.id} != ${sender.id}"
+            class="d-flex justify-content-start mb-2"
+          >
+            <div>
+              <strong
+                th:text="${message.senderUsername}"
+                class="d-block"
+              ></strong>
+              <div
+                class="alert alert-secondary"
+                style="
+                  background-color: #f1f3f5;
+                  border-radius: 15px;
+                  padding: 10px;
+                "
+              >
+                <span th:text="${message.content}"></span><br />
+                <span
+                  class="message-time"
+                  th:text="${#temporals.format(message.sentAt, 'HH:mm')}"
+                ></span>
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
 
-        <input type="hidden" id="senderId" th:value="${sender.id}">
-        <input type="hidden" id="receiverId" th:value="${receiver.id}">
-        <input type="hidden" id="senderUsername" th:value="${sender.username}">
+      <input type="hidden" id="senderId" th:value="${sender.id}" />
+      <input type="hidden" id="receiverId" th:value="${receiver.id}" />
+      <input type="hidden" id="senderUsername" th:value="${sender.username}" />
 
-        <input type="text" id="message" class="form-control" placeholder="메시지 입력">
-        <button onclick="sendMessage()" class="btn btn-primary mt-3">보내기</button>
+      <form id="message-form">
+        <input
+          type="text"
+          id="message"
+          class="form-control"
+          placeholder="메시지 입력"
+        />
+        <button type="submit" id="send-button" class="btn btn-primary">
+          보내기
+        </button>
+      </form>
 
-        <script th:src="@{/popper.min.js}"></script>
-        <script th:src="@{/bootstrap.min.js}"></script>
+      <script th:src="@{/popper.min.js}"></script>
+      <script th:src="@{/bootstrap.min.js}"></script>
     </div>
 
     <script>
-        var stompClient = null;
+      var stompClient = null;
+      var lastMessageDate = null;
 
-        function connect() {
-            var socket = new SockJS('/ws');
-            stompClient = Stomp.over(socket);
+      function connect() {
+        var socket = new SockJS("/ws");
+        stompClient = Stomp.over(socket);
 
-            stompClient.connect({}, function (frame) {
-                var receiverId = document.getElementById("receiverId").value;
-                stompClient.subscribe('/topic/chat/' + receiverId, function (message) {
-                    showMessage(JSON.parse(message.body));
-                });
-            });
+        stompClient.connect({}, function (frame) {
+          var senderId = document.getElementById("senderId").value;
+          stompClient.subscribe("/topic/chat/" + senderId, function (message) {
+            showMessage(JSON.parse(message.body));
+          });
+        });
+      }
+
+      function sendMessage() {
+        var messageContent = document.getElementById("message").value.trim();
+        var senderId = document.getElementById("senderId").value;
+        var receiverId = document.getElementById("receiverId").value;
+        var senderUsername = document.getElementById("senderUsername").value;
+
+        if (messageContent && stompClient) {
+          var chatMessage = {
+            sender: { id: senderId },
+            senderUsername: senderUsername,
+            receiver: { id: receiverId },
+            content: messageContent,
+            type: "CHAT",
+            sentAt: new Date(),
+          };
+          stompClient.send(
+            "/app/chat.sendMessage",
+            {},
+            JSON.stringify(chatMessage)
+          );
+          showMessage(chatMessage); // 즉시 메시지 표시
+          document.getElementById("message").value = "";
+        }
+      }
+
+      function showMessage(message) {
+        var chatBox = document.getElementById("chat-box");
+        var messageElement = document.createElement("div");
+
+        var sentAt = new Date(message.sentAt);
+        var sentAtTime = sentAt.toLocaleTimeString("ko-KR", {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+        var sentAtDate = sentAt.toLocaleDateString("ko-KR", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        });
+
+        // 날짜가 바뀌면 중앙에 날짜 구분선을 추가
+        if (lastMessageDate !== sentAtDate) {
+          var dateElement = document.createElement("div");
+          dateElement.className = "message-date";
+          dateElement.textContent = sentAtDate;
+          chatBox.appendChild(dateElement);
+          lastMessageDate = sentAtDate;
         }
 
-        function sendMessage() {
-            var messageContent = document.getElementById("message").value;
-            var senderId = document.getElementById("senderId").value;
-            var receiverId = document.getElementById("receiverId").value;
-            var senderUsername = document.getElementById("senderUsername").value;
-
-            if (messageContent && stompClient) {
-                var chatMessage = {
-                    senderId: senderId,
-                    senderUsername: senderUsername,
-                    receiverId: receiverId,
-                    content: messageContent,
-                    type: 'CHAT'
-                };
-                stompClient.send("/app/chat.sendMessage", {}, JSON.stringify(chatMessage));
-                document.getElementById("message").value = '';
-            }
+        // 메시지 박스 생성 (보낸 사람과 받는 사람에 따라 스타일을 달리함)
+        if (message.sender.id == document.getElementById("senderId").value) {
+          messageElement.classList.add("d-flex", "justify-content-end", "mb-2");
+          messageElement.innerHTML = `
+            <div>
+              <strong class="d-block text-end">${message.senderUsername}</strong>
+              <div class="alert alert-primary" style="background-color: #d1e7ff; border-radius: 15px; padding: 10px;">
+                <span>${message.content}</span><br>
+                <span class="message-time">${sentAtTime}</span>
+              </div>
+            </div>`;
+        } else {
+          messageElement.classList.add(
+            "d-flex",
+            "justify-content-start",
+            "mb-2"
+          );
+          messageElement.innerHTML = `
+            <div>
+              <strong class="d-block">${message.senderUsername}</strong>
+              <div class="alert alert-secondary" style="background-color: #f1f3f5; border-radius: 15px; padding: 10px;">
+                <span>${message.content}</span><br>
+                <span class="message-time">${sentAtTime}</span>
+              </div>
+            </div>`;
         }
 
-        function showMessage(message) {
-            var chatBox = document.getElementById("chat-box");
-            var messageElement = document.createElement('div');
+        chatBox.appendChild(messageElement);
+        chatBox.scrollTop = chatBox.scrollHeight;
+      }
 
-            // 서버에서 받은 LocalDateTime을 yyyy-MM-dd HH:mm 형식으로 변환
-            var sentAt = new Date(message.sentAt);
-            var year = sentAt.getFullYear();
-            var month = ('0' + (sentAt.getMonth() + 1)).slice(-2);
-            var day = ('0' + sentAt.getDate()).slice(-2);
-            var hours = ('0' + sentAt.getHours()).slice(-2);
-            var minutes = ('0' + sentAt.getMinutes()).slice(-2);
+      document
+        .getElementById("message-form")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          sendMessage();
+        });
 
-            var sentAtFormatted = `${year}-${month}-${day} ${hours}:${minutes}`;
+      document
+        .getElementById("message")
+        .addEventListener("keypress", function (e) {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            sendMessage();
+          }
+        });
 
-            if (message.senderId == document.getElementById("senderId").value) {
-                messageElement.classList.add('d-flex', 'justify-content-start');
-                messageElement.innerHTML = `<div class="alert alert-primary"><strong>${message.senderUsername}</strong>: ${message.content} <small>${sentAtFormatted}</small></div>`;
-            } else {
-                messageElement.classList.add('d-flex', 'justify-content-end');
-                messageElement.innerHTML = `<div class="alert alert-secondary"><strong>${message.senderUsername}</strong>: ${message.content} <small>${sentAtFormatted}</small></div>`;
-            }
-
-            chatBox.appendChild(messageElement);
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
-
-        connect();  // WebSocket 연결 시작
+      connect(); // WebSocket 연결 시작
     </script>
-</body>
+  </body>
 </html>

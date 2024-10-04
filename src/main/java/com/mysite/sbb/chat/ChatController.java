@@ -29,13 +29,11 @@ public class ChatController {
         SiteUser sender = userService.findByUsername(principal.getName());
         SiteUser receiver = userService.getUserById(receiverId);
 
-        // 채팅 기록 가져오기
-        List<ChatMessage> chatHistory = chatService.getChatHistory(sender.getId(), receiver.getId());
+        List<ChatMessage> chatHistory = chatService.getChatHistory(sender, receiver);
 
-        // 모델에 추가
         model.addAttribute("sender", sender);
         model.addAttribute("receiver", receiver);
-        model.addAttribute("receiverUsername", receiver.getUsername());  // 상대방 유저 이름 추가
+        model.addAttribute("receiverUsername", receiver.getUsername());
         model.addAttribute("chatHistory", chatHistory);
 
         return "message/chat_room";
@@ -43,19 +41,16 @@ public class ChatController {
 
     @MessageMapping("/chat.sendMessage")
     public void sendMessage(ChatMessage message) {
-        if (message.getSenderId() == null || message.getReceiverId() == null) {
-            System.out.println("Sender ID 또는 Receiver ID가 설정되지 않았습니다.");
+        if (message.getSender() == null || message.getReceiver() == null) {
+            System.out.println("Sender 또는 Receiver가 설정되지 않았습니다.");
             return;
         }
 
-        // 서버에서 전송 시간을 설정하여 메시지를 저장
         message.setSentAt(LocalDateTime.now());
 
-        // 메시지 저장
-        chatService.saveMessage(message.getSenderId(), message.getReceiverId(), message.getContent());
+        chatService.saveMessage(message);
 
-        // 메시지 전송
-        String destination = "/topic/chat/" + message.getReceiverId();
+        String destination = "/topic/chat/" + message.getReceiver().getId();
         messagingTemplate.convertAndSend(destination, message);
     }
 }

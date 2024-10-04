@@ -1,13 +1,22 @@
 package com.mysite.sbb.chat;
 
+import java.time.LocalDateTime;
+
+import com.mysite.sbb.user.SiteUser;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -18,18 +27,33 @@ public class ChatMessage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long senderId;  // 발신자 ID
-    private String senderUsername;  // 발신자 이름
-    private String content;  // 메시지 내용
-    private Long receiverId;  // 수신자 ID
-    private MessageType type;  // 메시지 유형
-    private LocalDateTime sentAt;  // 메시지 전송 시간
+    @ManyToOne
+    @JoinColumn(name = "sender_id")
+    private SiteUser sender;
+
+    @Column(nullable = false)
+    private String senderUsername;
+    private String content;
+
+    @ManyToOne
+    @JoinColumn(name = "receiver_id")
+    private SiteUser receiver;
+
+    @Enumerated(EnumType.STRING)
+    private MessageType type;
+    private LocalDateTime sentAt;
 
     public enum MessageType {
         CHAT,
         JOIN,
         LEAVE
     }
+
+    @PrePersist
+    @PreUpdate
+    private void ensureSenderUsername() {
+        if (this.sender != null && (this.senderUsername == null || this.senderUsername.isEmpty())) {
+            this.senderUsername = this.sender.getUsername();
+        }
+    }
 }
-
-
