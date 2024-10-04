@@ -1,8 +1,9 @@
 package com.mysite.sbb.chat;
 
-import com.mysite.sbb.user.SiteUser;
-import com.mysite.sbb.user.UserService;
-import lombok.RequiredArgsConstructor;
+import java.security.Principal;
+import java.time.LocalDateTime;
+import java.util.List;
+
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
@@ -10,9 +11,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import java.security.Principal;
-import java.time.LocalDateTime;
-import java.util.List;
+import com.mysite.sbb.user.SiteUser;
+import com.mysite.sbb.user.UserService;
+
+import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Controller
