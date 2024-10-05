@@ -129,12 +129,22 @@
         var socket = new SockJS("/ws");
         stompClient = Stomp.over(socket);
 
-        stompClient.connect({}, function (frame) {
-          var senderId = document.getElementById("senderId").value;
-          stompClient.subscribe("/topic/chat/" + senderId, function (message) {
-            showMessage(JSON.parse(message.body));
-          });
-        });
+        stompClient.connect(
+          {},
+          function (frame) {
+            var senderId = document.getElementById("senderId").value;
+            stompClient.subscribe(
+              "/topic/chat/" + senderId,
+              function (message) {
+                showMessage(JSON.parse(message.body));
+              }
+            );
+          },
+          function (error) {
+            console.error("STOMP error: " + error);
+            setTimeout(connect, 5000); // 5초 후 재연결 시도
+          }
+        );
       }
 
       function sendMessage() {
@@ -145,7 +155,7 @@
 
         if (messageContent && stompClient) {
           var chatMessage = {
-            sender: { id: senderId },
+            sender: { id: senderId, username: senderUsername },
             senderUsername: senderUsername,
             receiver: { id: receiverId },
             content: messageContent,
