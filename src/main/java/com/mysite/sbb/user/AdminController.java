@@ -45,7 +45,7 @@ public class AdminController {
     }
 
     @PostMapping("/user/delete/{id}")
-    public String deleteUser(@PathVariable Long id) {
+    public String deleteUser(@PathVariable("id") Long id) {
         SiteUser siteUser = userService.getUserById(id);
         if (siteUser != null) {
             userService.delete(siteUser);

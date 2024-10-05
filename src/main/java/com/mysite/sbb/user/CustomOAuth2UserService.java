@@ -60,7 +60,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         // 사용자 정보 반환을 위한 customAttributes 설정
         Map<String, Object> customAttributes = Map.of(
-                "id", username,
+                "username", username,
                 "name", username);
 
         return new DefaultOAuth2User(
