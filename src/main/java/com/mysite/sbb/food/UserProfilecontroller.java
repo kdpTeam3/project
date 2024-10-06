@@ -15,14 +15,14 @@ import com.mysite.sbb.service.RestClientService;
 
 @RequestMapping("/food")
 @Controller
-public class UserProfileController {
+public class UserProfilecontroller {
 
     private final RestTemplate restTemplate = new RestTemplate();
     private final String FLASK_BASE_URL = "http://127.0.0.1:5000"; // Flask 서버 주소
 
     private final RestClientService restClientService;
 
-    public UserProfileController(RestClientService restClientService) {
+    public UserProfilecontroller(RestClientService restClientService) {
         this.restClientService = restClientService;
     }
 
