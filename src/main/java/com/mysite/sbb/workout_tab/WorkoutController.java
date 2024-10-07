@@ -1,5 +1,6 @@
 package com.mysite.sbb.workout_tab;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mysite.sbb.user.SiteUser;
 import com.mysite.sbb.user.UserService;
 import com.mysite.sbb.workout_tab.routine.Routine;
@@ -178,6 +179,8 @@ public class WorkoutController {
   @PreAuthorize("isAuthenticated()")
   @GetMapping("/my_goal")
   public String myGoal(Model model, Principal principal) {
+    List<Routine> routines = routineRepository.findRoutinesBySiteUserUsername(principal.getName());
+    model.addAttribute("routines", routines);
     return "my_goal";
   }
 }
