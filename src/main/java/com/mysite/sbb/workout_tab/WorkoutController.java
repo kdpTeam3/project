@@ -183,4 +183,11 @@ public class WorkoutController {
     model.addAttribute("routines", routines);
     return "my_goal";
   }
+
+  @GetMapping("/routines/{id}")
+  public String getRoutineById(@PathVariable Long id, Model model){
+    Optional<Routine> routine = routineService.findById(id);
+    model.addAttribute("routine", routine);
+    return "my_goal";
+  }
 }
