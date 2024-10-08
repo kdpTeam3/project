@@ -6,16 +6,9 @@
   <title>운동 세트 관리</title>
   <link rel="stylesheet" type="text/css" th:href="@{/bootstrap.min.css}"/>
   <link rel="stylesheet" type="text/css" th:href="@{/make_routine.css}"/>
-  <style>
-    li {
-      list-style-type: none;
-    }
-  </style>
 </head>
 
 <body>
-<!-- 네비게이션 바 -->
-<nav th:replace="~{navbar :: navbarFragment}"></nav>
 
 <!-- 메인 콘텐츠 -->
 <div class="container mt-5">
@@ -393,13 +386,13 @@
                 <button type="button" class="btn btn-danger btn-remove" onclick="removeWorkout(this)">x</button>
             </div>
             <div class="set-header set-row">
-                <div style="display: none; width: 100px;">세트</div>
-                <div style="display: none; width: 100px;">중량</div>
-                <div style="display: none;width: 100px;">횟수</div>
-                <div style="display: none;width: 100px;"></div>
+                <div style="width: 100px;">세트</div>
+                <div style="width: 100px;">중량</div>
+                <div style="width: 100px;">횟수</div>
+                <div style="width: 100px;"></div>
             </div>
             <div class="set-container"></div> <!-- 세트 컨테이너 추가 -->
-            <button style="display: none" type="button" class="btn btn-link btn-add" onclick="addSet(this)">세트 추가</button>
+            <button type="button" class="btn btn-link btn-add" onclick="addSet(this)">세트 추가</button>
         `;
     return newGroup;
   }
@@ -486,13 +479,13 @@
     const setRow = document.createElement('div');
     setRow.classList.add('set-row');
     setRow.innerHTML = `
-          <div style="width: 100px; display: none">${setNumber}</div>
-          <input type="hidden" class="form-control"  name="workouts[${
+          <div style="width: 100px;">${setNumber}</div>
+          <input type="number" class="form-control"  name="workouts[${
         workoutId - 1
-    }].workoutSet[${setNumber - 1}].weight" value = "0" placeholder="kg" style="width: 100px; text-align: right;">
-          <input type="hidden" class="form-control"  name="workouts[${
+    }].workoutSet[${setNumber - 1}].weight" required min="0" placeholder="kg" style="width: 100px; text-align: right;">
+          <input type="number" class="form-control"  name="workouts[${
         workoutId - 1
-    }].workoutSet[${setNumber - 1}].reps" value = "0" placeholder="회" style="width: 100px; text-align: right;">
+    }].workoutSet[${setNumber - 1}].reps" required min="0" placeholder="회" style="width: 100px; text-align: right;">
           <button type="button" class="btn btn-danger btn-remove" onclick="removeSet(this)">세트 제거</button>
       `;
     return setRow;

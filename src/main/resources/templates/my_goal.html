@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width"/>
+  <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" type="text/css" th:href="@{/bootstrap.min.css}"/>
+  <link rel="stylesheet" type="text/css" th:href="@{/my_goal.css}"/>
+  <title>Calendar</title>
+  <style>
+    .modal-header {
+      background-color: #fffb80;
+    }
+
+    .modal-content {
+      background: #fffb80;
+      text-align: center;
+    }
+
+    .routine-list {
+      border: /*solid black 1px*/ #F4F6FF;
+      border-radius: 15px;
+      margin: 0 auto 5px;
+      padding: 2px;
+      background-color: #D3EE98;
+      width: 50%;
+    }
+
+    .routine-list:hover {
+      cursor: pointer;
+      background: #A0D683;
+    }
+  </style>
+</head>
+<body>
+<nav th:replace="~{navbar :: navbarFragment}"></nav>
+
+<div class="main">
+  <div class="content-wrap">
+    <div class="content-left">
+      <div class="main-wrap">
+        <div id="main-day" class="main-day"></div>
+        <div id="main-date" class="main-date"></div>
+      </div>
+      <div class="todo-wrap">
+        <div class="todo-title">Todo List</div>
+        <div class="input-wrap">
+          <input type="text" placeholder="please write here!!" id="input-box" class="input-box"/>
+          <button type="button" id="input-data" class="input-data">INPUT</button>
+          <div id="input-list" class="input-list"></div>
+        </div>
+      </div>
+    </div>
+    <div class="content-right">
+      <button id="workout-record-btn" type="button" onclick="showRoutineModal()">
+        운동 기록하기
+      </button>
+      <table id="calendar">
+        <thead>
+        <tr class="btn-wrap clearfix">
+          <td>
+            <label id="prev"> &#60; </label>
+          </td>
+          <td colspan="5" id="current-year-month"></td>
+          <td>
+            <label id="next"> &#62; </label>
+          </td>
+        </tr>
+        <tr>
+          <td class="sun">Sun</td>
+          <td>Mon</td>
+          <td>Tue</td>
+          <td>Wed</td>
+          <td>Thu</td>
+          <td>Fri</td>
+          <td class="sat">Sat</td>
+        </tr>
+        </thead>
+        <tbody id="calendar-body" class="calendar-body"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<!--모달 HTML-->
+<div class="modal fade" id="routineModal" tabindex="-1" aria-labelledby="routineModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-lg" id="modal-container">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="routineModalLabel">운동 기록 <span id="modal-selected-date"></span>
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <!--modal-body-->
+      <!--루틴 선택 모달 -->
+      <div class="modal-body" id="modal-body-routine-list">
+        <div>
+          <h3>루틴 목록</h3>
+        </div>
+        <div class="routine-content">
+          <div class="routine-list" th:each="routine : ${routines}" onclick="test(this)">
+            <h5 class="mb-1" th:text="${routine.routine_name}" th:id="${routine.getId()}"></h5>
+            <div class="routine-list-item">
+              <div th:each="workout : ${routine.workouts}">
+                <p class="mb-1"
+                   th:text="${workout.workout_name} + ' x'+ ${workout.workoutSet.size()}"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!--루틴 데이터 입력 모달-->
+      <div class="modal-body d-none" id="modal-body-make-routine">
+        <div id="routine-name" th:each="routine : ${routines}">
+
+          <!-- 루틴 반복 -->
+          <div class="record" th:id="record+${routine.getId()}">
+            <div class="record-item">
+              <h5 class="mb-1" th:text="${routine.routine_name}"></h5>
+              <div class="workout-list">
+                <div th:each="workout : ${routine.workouts}">
+                  <table>
+                    <tr>
+                      <td>운동</td>
+                      <td>세트</td>
+                      <td>무게</td>
+                      <td>횟수</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <p class="mb-1" th:text="${workout.workout_name}"></p>
+                      </td>
+                      <td>
+                        <input type="number">
+                      </td>
+                      <td>
+                        <input type="number">
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!--돌아가기 버튼-->
+        <button id="switch-to-routine-list" class="btn btn-secondary"
+                onclick="switchToRoutineList()">
+          루틴 목록으로 돌아가기
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script th:inline="javascript">
+  var currentTitle = document.getElementById("current-year-month");
+  var calendarBody = document.getElementById("calendar-body");
+  var mainDay = document.getElementById("main-day");
+  var mainDate = document.getElementById("main-date");
+  var today = new Date();
+  var first = new Date(today.getFullYear(), today.getMonth(), 1);
+  var dayList = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  var monthList = ["January", "February", "March", "April", "May", "June", "July", "August",
+    "September", "October", "November", "December"];
+  var leapYear = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  var notLeapYear = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  var pageYear;
+  var selected_date;
+  var routineId;
+
+  if (first.getFullYear() % 4 === 0) {
+    pageYear = leapYear;
+  } else {
+    pageYear = notLeapYear;
+  }
+
+  function test(element) {
+    const routineH5 = element.querySelector('h5');
+    routineId = routineH5.id;
+    const record = document.getElementsByClassName('record');
+
+    for (let i = 0; i < record.length; i++) {
+      // record[i].classList.remove('d-none');
+    }
+
+    for (let i = 0; i < record.length; i++) {
+      if (record[i].id != "record" + routineId) {
+        record[i].classList.add('d-none');
+      } else {
+        record[i].classList.remove('d-none');
+      }
+    }
+
+    // 모달 전환
+    document.getElementById('modal-body-routine-list').classList.add('d-none');
+    document.getElementById('modal-body-make-routine').classList.remove('d-none');
+
+  }
+
+  function switchToRoutineList() {
+    document.getElementById('modal-body-routine-list').classList.remove('d-none');
+    document.getElementById('modal-body-make-routine').classList.add('d-none');
+  }
+
+  // 운동 기록하기 버튼 클릭 이벤트
+  // 모달 생성
+  function showRoutineModal() {
+    const routineModal = new bootstrap.Modal(document.getElementById('routineModal'));
+    document.getElementById("modal-selected-date").textContent = selected_date;
+    // 루틴목록 보여주기
+    document.getElementById('modal-body-routine-list').classList.remove('d-none');
+    document.getElementById('modal-body-make-routine').classList.add('d-none');
+    routineModal.show();
+  }
+
+  // 루틴목록 모달컨텐츠
+  // function CreateRoutineContent() {
+  //   const newGroup = document.createElement('div');
+  //   newGroup.innerHTML = ``;
+  //   return newGroup;
+  // }
+  //
+  // document.addEventListener('DOMContentLoaded', () => {
+  //   document.body.appendChild(CreateRoutineContent());
+  // });
+
+  // 운동 기록하기 content
+  // function createRecordRoutine() {
+  //
+  // }
+
+  function showCalendar() {
+    let monthCnt = 100;
+    let cnt = 1;
+    for (var i = 0; i < 6; i++) {
+      var $tr = document.createElement("tr");
+      $tr.setAttribute("id", monthCnt);
+      for (var j = 0; j < 7; j++) {
+        if ((i === 0 && j < first.getDay()) || cnt > pageYear[first.getMonth()]) {
+          var $td = document.createElement("td");
+          $tr.appendChild($td);
+        } else {
+          var $td = document.createElement("td");
+          $td.textContent = cnt;
+          $td.setAttribute("id", cnt);
+          if (cnt === today.getDate() && first.getMonth() === today.getMonth()
+              && first.getFullYear() === today.getFullYear()) {
+            $td.classList.add("active");
+          }
+          $tr.appendChild($td);
+          cnt++;
+        }
+      }
+      monthCnt++;
+      calendarBody.appendChild($tr);
+    }
+  }
+
+  function removeCalendar() {
+    let catchTr = 100;
+    for (var i = 100; i < 106; i++) {
+      var $tr = document.getElementById(catchTr);
+      if ($tr) {
+        $tr.remove();
+      }
+      catchTr++;
+    }
+  }
+
+  function showMain() {
+    mainDay.innerHTML = dayList[today.getDay()];
+    mainDate.innerHTML = today.getDate();
+  }
+
+  showCalendar();
+  showMain();
+
+  // 현재 년월 표시
+  currentTitle.textContent = monthList[first.getMonth()] + " " + first.getFullYear();
+
+  // 이전 달, 다음 달 이동
+  document.getElementById("prev").addEventListener("click", function () {
+    removeCalendar();
+    today = new Date(first.getFullYear(), first.getMonth() - 1, today.getDate());
+    first = new Date(today.getFullYear(), today.getMonth(), 1);
+    showCalendar();
+    showMain();
+    currentTitle.textContent = monthList[first.getMonth()] + " " + first.getFullYear();
+  });
+
+  document.getElementById("next").addEventListener("click", function () {
+    removeCalendar();
+    today = new Date(first.getFullYear(), first.getMonth() + 1, today.getDate());
+    first = new Date(today.getFullYear(), today.getMonth(), 1);
+    showCalendar();
+    showMain();
+    currentTitle.textContent = monthList[first.getMonth()] + " " + first.getFullYear();
+  });
+
+  // 날짜 클릭 이벤트
+  calendarBody.addEventListener("click", function (e) {
+    if (e.target.tagName === "TD" && e.target.textContent !== "") {
+      let active = document.querySelector(".active")
+      selected_date = first.getFullYear() + '-' + first.getMonth() + '-' + e.target.textContent;
+      if (active) {
+        active.classList.remove("active");
+      }
+      e.target.classList.add("active");
+      today = new Date(first.getFullYear(), first.getMonth(), e.target.textContent);
+      console.log(selected_date);
+      showMain();
+      loadTodoList();
+    }
+  });
+
+  // Todo 리스트
+  var inputBox = document.getElementById("input-box");
+  var inputDate = document.getElementById("input-data");
+  var inputList = document.getElementById("input-list");
+
+  inputDate.addEventListener("click", addTodoList);
+
+  var todoList = {};
+
+  function addTodoList() {
+    var key = generateDateKey(today);
+    if (inputBox.value !== "") {
+      if (!todoList[key]) {
+        todoList[key] = [];
+      }
+      todoList[key].push(inputBox.value);
+      inputBox.value = "";
+      loadTodoList();
+    }
+  }
+
+  function loadTodoList() {
+    var key = generateDateKey(today);
+    inputList.innerHTML = "";
+    if (todoList[key]) {
+      todoList[key].forEach(function (todo, index) {
+        var $div = document.createElement("div");
+        $div.textContent = todo;
+        var $btn = document.createElement("button");
+        $btn.textContent = "X";
+        $btn.addEventListener("click", function () {
+          todoList[key].splice(index, 1);
+          loadTodoList();
+        });
+        inputList.appendChild($div);
+        inputList.appendChild($btn);
+      });
+    }
+  }
+
+  function generateDateKey(date) {
+    return date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
+  }
+
+  // Todo 리스트 관련 변수와 함수
+  var inputBox = document.getElementById("input-box");
+  var inputDate = document.getElementById("input-data");
+  var inputList = document.getElementById("input-list");
+
+  inputDate.addEventListener("click", addTodoList);
+
+  var todoList = {};
+
+  function addTodoList() {
+    var key = generateDateKey(today);
+    if (inputBox.value !== "") {
+      if (!todoList[key]) {
+        todoList[key] = [];
+      }
+      todoList[key].push(inputBox.value);
+      inputBox.value = "";
+      loadTodoList();
+    }
+  }
+
+  function loadTodoList() {
+    var key = generateDateKey(today);
+    inputList.innerHTML = "";
+    if (todoList[key]) {
+      todoList[key].forEach(function (todo, index) {
+        var $div = document.createElement("div");
+        $div.textContent = todo;
+        var $btn = document.createElement("button");
+        $btn.textContent = "X";
+        $btn.addEventListener("click", function () {
+          todoList[key].splice(index, 1);
+          loadTodoList();
+        });
+        inputList.appendChild($div);
+        inputList.appendChild($btn);
+      });
+    }
+  }
+
+  function generateDateKey(date) {
+    return date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
+  }
+
+  loadTodoList();
+</script>
+<!-- Popper.js 및 Bootstrap JS 추가 -->
+<script th:src="@{/popper.min.js}"></script>
+<script th:src="@{/bootstrap.min.js}"></script>
+</body>
+</html>
