@@ -19,13 +19,14 @@
     <!-- 내비게이션 바 -->
     <nav th:replace="~{navbar :: navbarFragment}"></nav>
     
-    <div class="hero d-flex flex-column justify-content-center align-items-center" id="home">
-      <div style="display: flex; justify-content: space-between">
+    <div class="hero d-flex flex-column justify-content-center align-items-center" id="home" style="z-index: 0;">
+      <div class="bg-overlay" style="z-index: 1;"></div>
+      <div style="display: flex; justify-content: space-between; color:white; z-index: 2;" >
         <h1>나의 루틴</h1>
         <button type="button" onclick="location.href='/workout/make_routine'">+루틴 추가</button>
       </div>
 
-      <div class="container mt-5">
+      <div class="container mt-5" style="z-index:2;">
         <div class="row">
           <div class="col">
             <div class="list-group">

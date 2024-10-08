@@ -17,11 +17,11 @@
 }
 
 .second-navbar .nav-item .nav-link:hover {
-    background-color: #007bff; /* Hover 시 배경 색 */
+    background-color: #f13a11; /* Hover 시 배경 색 */
     color: #ffffff; /* Hover 시 글자 색 */
 }
 
 .second-navbar .nav-item .active {
-    background-color: #007bff; /* 활성화된 링크의 배경 색 */
+    background-color: #f13a11; /* 활성화된 링크의 배경 색 */
     color: #ffffff; /* 활성화된 링크의 글자 색 */
 }
