@@ -72,13 +72,7 @@ public class UserService {
     // 삭제 시 작성했던 질문과 답변 또한 함께 삭제됨
     // 트랜잭션 보장이란, 여러 데이터베이스 작업을 하나의 논리적 단위로 처리하여 모든 작업이 성공적으로 완료되거나,
     // 하나라도 실패할 경우 모든 작업이 취소되는 것을 의미
-    @Transactional
     public void delete(SiteUser siteUser) {
-        // 사용자가 작성한 질문 삭제
-        questionRepository.deleteByAuthor(siteUser);
-        // 사용자가 작성한 답변 삭제
-        answerRepository.deleteByAuthor(siteUser);
-        // 최종적으로 사용자 삭제
         this.userRepository.delete(siteUser);
     }
 

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" type="text/css" th:href="@{/bootstrap.min.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/style.css}">
+    <title>보낸 메시지함</title>
+    <style>
+        .table td, .table th {
+            vertical-align: middle;  /* 테이블 셀 안의 내용 수직 중앙 정렬 */
+        }
+        .table-btn {
+            text-align: center;  /* 버튼이 가운데로 정렬되도록 설정 */
+        }
+    </style>
+</head>
+<body>
+    <nav th:replace="~{navbar :: navbarFragment}"></nav>
+    <div class="container my-5">
+        <div class="card shadow-lg p-4">
+            <h4 class="mb-4">보낸 메시지함</h4>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>받는 사람</th>
+                        <th>내용</th>
+                        <th>보낸 시간</th>
+                        <th class="table-btn">채팅</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="message : ${messages}">
+                        <td th:text="${message.receiver.username}">받는 사람</td>
+                        <td th:text="${message.content}">메시지 내용</td>
+                        <td th:text="${#temporals.format(message.sentAt, 'yyyy-MM-dd HH:mm')}">보낸 시간</td>
+                        <!-- 채팅 시작 버튼은 메시지가 읽힌 경우에만 노출 -->
+                        <td class="table-btn">
+                            <a th:href="@{|/chat/${message.receiver.id}|}" class="btn btn-primary" th:if="${message.isRead}">채팅 시작</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script th:src="@{/popper.min.js}"></script> 	
+    <script th:src="@{/bootstrap.min.js}"></script>
+</body>
+</html>

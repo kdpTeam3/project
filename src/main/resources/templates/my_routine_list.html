@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <!--  Required meta tags -->
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width , initial-scale=1, shrink-to-fit=no"/>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" type="text/css" th:href="@{/bootstrap.min.css}"/>
+  <title>Fitness</title>
+</head>
+
+<body>
+
+<div style="display: flex; justify-content: space-between">
+  <h1>나의 루틴</h1>
+  <button type="button" onclick="location.href='/workout/make_routine'">+루틴 추가</button>
+</div>
+
+<div class="container mt-5">
+  <div class="row">
+    <div class="col">
+      <div class="list-group">
+        <div class="list-group-item" th:each="routine : ${routines}" onclick="routineInfo(this)">
+          <div style="display: flex; justify-content: space-between">
+            <h5 class="mb-1" th:text="${routine.routine_name}">루틴 이름</h5>
+            <p class="routineId" style="display: none" th:text="${routine.getId()}">id</p>
+            <!--            <button class="btn btn-danger delete-workout" onclick="deleteRoutine(this)">-->
+            <!--              삭제-->
+            <!--            </button>-->
+          </div>
+          <div th:each="workout : ${routine.workouts}">
+            <p
+                class="mb-1"
+                th:text="${workout.workout_name} + ' x ' + ${workout.workoutSet.size()}"
+            >
+              운동 이름 x 세트 수
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div
+    class="modal fade"
+    id="routineModal"
+    tabindex="-1"
+    aria-labelledby="routineModalLabel"
+    aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="routineModalLabel">루틴 정보</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div id="routineInfo">
+          <p>운동 종목</p>
+          <p>1세트 무게 &times; 횟수</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script th:inline="javascript">
+
+
+  function routineInfo(div) {
+    var listGroupItem = div.closest('.list-group-item');
+    var routineId = listGroupItem.querySelector('.routineId').textContent;
+    console.log(routineId);
+    const routineModal = new bootstrap.Modal(document.getElementById('routineModal'));
+    routineModal.show();
+  }
+</script>
+
+<!-- JQuery -->
+<!-- Popper.js 및 Bootstrap JS -->
+<script th:src="@{/popper.min.js}"></script>
+<!-- Popper.js 추가 -->
+<script th:src="@{/bootstrap.min.js}"></script>
+<!-- Bootstrap JS 추가 -->
+</body>
+</html>

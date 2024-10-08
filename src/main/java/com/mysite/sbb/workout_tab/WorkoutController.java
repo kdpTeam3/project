@@ -1,5 +1,6 @@
 package com.mysite.sbb.workout_tab;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mysite.sbb.user.SiteUser;
 import com.mysite.sbb.user.UserService;
 import com.mysite.sbb.workout_tab.routine.Routine;
@@ -138,7 +139,7 @@ public class WorkoutController {
       return "redirect:my_routine"; // 리다이렉션
     } catch (Exception e) {
       model.addAttribute("message", "루틴 저장 중 오류가 발생했습니다" + e.getMessage());
-      return "make_routine";
+      return "record_routine";
     }
   }
 
@@ -157,21 +158,36 @@ public class WorkoutController {
   // 루틴 삭제
   @PreAuthorize("isAuthenticated()")
   @DeleteMapping("/delete/{id}")
-  public ResponseEntity<String> deleteRoutine(@PathVariable("id") Long id, Principal principal){
+  public ResponseEntity<String> deleteRoutine(@PathVariable("id") Long id, Principal principal) {
     Optional<Routine> optionalRoutine = this.routineRepository.findById(id);
 
-    if(optionalRoutine.isPresent()){
+    if (optionalRoutine.isPresent()) {
       Routine routine = optionalRoutine.get();
 
       // 현재 로그인한 사용자가 루틴의 소유자인지 확인
-      if(!routine.getSiteUser().getUsername().equals(principal.getName())){
+      if (!routine.getSiteUser().getUsername().equals(principal.getName())) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body("삭제할 권한이 없습니다");
       }
 
       this.routineRepository.delete(routine);
       return ResponseEntity.ok("루틴이 성공적으로 삭제되었습니다.");
-    }else{
+    } else {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body("루틴을 찾을 수 없습니다.");
     }
+  }
+
+  @PreAuthorize("isAuthenticated()")
+  @GetMapping("/my_goal")
+  public String myGoal(Model model, Principal principal) {
+    List<Routine> routines = routineRepository.findRoutinesBySiteUserUsername(principal.getName());
+    model.addAttribute("routines", routines);
+    return "my_goal";
+  }
+
+  @GetMapping("/routines/{id}")
+  public String getRoutineById(@PathVariable Long id, Model model){
+    Optional<Routine> routine = routineService.findById(id);
+    model.addAttribute("routine", routine);
+    return "my_goal";
   }
 }

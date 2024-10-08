@@ -35,31 +35,43 @@ public class SecurityConfig {
         tokenResponseClient.setRequestEntityConverter(converter);
 
         http
-                .authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests
-                        .requestMatchers("/manage/**").hasRole("ADMIN")
-                        .requestMatchers(new AntPathRequestMatcher("/**")).permitAll())
-                .csrf((csrf) -> csrf
-                        .ignoringRequestMatchers(new AntPathRequestMatcher("/h2-console/**"),
-                                                 new AntPathRequestMatcher("/food/**")))
-                .headers((headers) -> headers
-                        .addHeaderWriter(new XFrameOptionsHeaderWriter(
-                                XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN)))
-                .formLogin((formLogin) -> formLogin
-                        .loginPage("/user/login")
-                        .defaultSuccessUrl("/", true) // 로그인 성공 시 메인 페이지로 리디렉트
+            .authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests
+                .requestMatchers("/manage/**").hasRole("ADMIN")
+                .requestMatchers(new AntPathRequestMatcher("/messages/**")).authenticated()
+                .requestMatchers(new AntPathRequestMatcher("/**")).permitAll()
+            )
+            .csrf((csrf) -> csrf
+                .ignoringRequestMatchers(
+                    new AntPathRequestMatcher("/h2-console/**"), 
+                    new AntPathRequestMatcher("/food/**"),
+                    new AntPathRequestMatcher("/messages/send"),  // 메시지 전송 경로에 대한 CSRF 보호 무시
+                    new AntPathRequestMatcher("/messages/delete/**")  // 메시지 삭제 경로에 대해 CSRF 무시
                 )
-                .logout((logout) -> logout
-                        .logoutRequestMatcher(new AntPathRequestMatcher("/user/logout"))
-                        .logoutSuccessUrl("/")
-                        .invalidateHttpSession(true))
-                .oauth2Login(oauth2Login -> oauth2Login
-                        .loginPage("/user/login")
-                        .defaultSuccessUrl("/") // 로그인 성공 후 메인 페이지로 이동
-                        .tokenEndpoint(tokenEndpoint -> tokenEndpoint.accessTokenResponseClient(tokenResponseClient) // 카카오
-                                                                                                                     // 인증
-                                                                                                                     // 처리
-                        )
-                        .userInfoEndpoint(userInfoEndpoint -> userInfoEndpoint.userService(customOAuth2UserService)));
+            )
+            .headers((headers) -> headers
+                .addHeaderWriter(new XFrameOptionsHeaderWriter(
+                    XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN))
+            )
+            .formLogin((formLogin) -> formLogin
+                .loginPage("/user/login")
+                .defaultSuccessUrl("/", true) // 로그인 성공 시 메인 페이지로 리디렉트
+            )
+            .logout((logout) -> logout
+                .logoutRequestMatcher(new AntPathRequestMatcher("/user/logout"))
+                .logoutSuccessUrl("/")
+                .invalidateHttpSession(true)
+            )
+            .oauth2Login(oauth2Login ->
+                oauth2Login
+                    .loginPage("/user/login")
+                    .defaultSuccessUrl("/")  // 로그인 성공 후 메인 페이지로 이동
+                    .tokenEndpoint(tokenEndpoint -> 
+                        tokenEndpoint.accessTokenResponseClient(tokenResponseClient) // 카카오 인증 처리
+                    )
+                    .userInfoEndpoint(userInfoEndpoint ->
+                        userInfoEndpoint.userService(customOAuth2UserService)
+                    )
+            );
         return http.build();
     }
 
@@ -69,8 +81,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
-            throws Exception {
+    AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
 }
