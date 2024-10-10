@@ -8,6 +8,8 @@
         <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=4da040eab87f2357a9dd38898d9ba6bf&libraries=services,places"></script>
         <link rel="stylesheet" th:href="@{/bootstrap.min.css}" />
         <!-- Bootstrap CSS 경로 확인 -->
+        <link href="../static/css/bootstrap.min.css" rel="stylesheet"> <!-- Bootstrap CSS 파일 경로 -->
+        <link href="../static/css/tooplate-gymso-style.css" rel="stylesheet"> <!-- 사용자 정의 CSS 파일 경로 -->
         <style>
             #map {
                 width: 70%; /* 지도의 가로 크기를 70%로 설정 */
@@ -25,6 +27,7 @@
                 border-bottom: 1px solid #ccc; /* 아이템 간 구분선 설정 */
             }
         </style>
+        
     </head>
     <body>
         <!-- 내비게이션 바 -->
@@ -152,5 +155,8 @@
                 infowindow.open(map, marker); // 마커에 인포윈도우 표시
             }
         </script>
+        <!-- Popper.js 및 Bootstrap JavaScript 파일 4.2.1 version-->
+        <script src="../static/popper.min.js"></script> <!-- Popper.js 파일 경로 -->
+        <script src="../static/bootstrap.min.js"></script> <!-- Bootstrap.js 파일 경로 -->
     </body>
 </html>
