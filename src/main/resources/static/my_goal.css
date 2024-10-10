@@ -290,5 +290,42 @@ body {
     }
   }
 
+  .workout-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .workout-record-input {
+    width: 70px;
+    background-color: inherit;
+    border: none;
+    border-bottom: 1px solid;
+    padding: 5px;
+    margin-bottom: 5px;
+    text-align: center;
+    font-size: 16px;
+    color: black;
+    transition: background-color 0.3s;
+
+    &:focus {
+      outline: none;
+    }
+
+  }
+
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+
+  }
+
+  .workout-item {
+    border: solid #146c43 1px;
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 10px;
+
+  }
 
 }
