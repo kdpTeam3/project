@@ -1,6 +1,7 @@
 package com.mysite.sbb.user;
 
 import java.security.Principal;
+
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -50,7 +51,14 @@ public class UserController {
             session.removeAttribute("naverEmail");
         } catch (DataIntegrityViolationException e) {
             e.printStackTrace();
-            bindingResult.reject("signupFailed", "이미 등록된 사용자입니다.");
+            String errorMessage = e.getMessage().toLowerCase();
+            if (errorMessage.contains("username")) {
+                bindingResult.rejectValue("username", "duplicate.username", "이미 사용 중인 사용자명입니다.");
+            } else if (errorMessage.contains("email")) {
+                bindingResult.rejectValue("email", "duplicate.email", "이미 등록된 이메일 주소입니다.");
+            } else {
+                bindingResult.reject("signupFailed", "회원 가입 중 오류가 발생했습니다.");
+            }
             return "signup_form";
         } catch (Exception e) {
             e.printStackTrace();
@@ -74,7 +82,7 @@ public class UserController {
     @GetMapping("/modify")
     public String userModifyForm(UserModifyForm userModifyForm, Principal principal, Model model) {
         SiteUser siteUser = this.userService.getUser(principal.getName());
-        
+
         // 로그로 Principal 확인
         System.out.println("Logged in user: " + principal.getName());
 
