@@ -1,53 +1,78 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" type="text/css" th:href="@{/bootstrap.min.css}">
-    <link rel="stylesheet" type="text/css" th:href="@{/style.css}">
-    <title>나만의 운동 파트너 찾기</title>
-</head>
-<body>
-    <!-- 네비게이션 바 -->
-    <nav th:replace="~{navbar :: navbarFragment}"></nav>
-    
-    <div th:utext="${matchingForm}"></div>
-    
-    <div id="matchResults"></div>
-    <div id="loadingIndicator" style="display: none;">잠시만 기다려주세요!</div>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <title>나만의 운동 파트너 찾기</title>
 
-    <script th:src="@{/popper.min.js}"></script>
-    <script th:src="@{/bootstrap.min.js}"></script>
-    <script>
-        document.addEventListener('submit', function(e) {
-            if (e.target.action.includes('/match')) {
-                e.preventDefault();
-                
-                const formData = new FormData(e.target);
-                const loadingIndicator = document.getElementById('loadingIndicator');
-                const matchResults = document.getElementById('matchResults');
-                
-                loadingIndicator.style.display = 'block';
-                matchResults.innerHTML = '';
-                
-                fetch('http://localhost:8000/match', {
-                    method: 'POST',
-                    body: formData,
-                    mode: 'cors'
-                })
-                .then(response => response.text())
-                .then(html => {
-                    matchResults.innerHTML = html;
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    matchResults.innerHTML = '<p>Error fetching matches. Please try again. Error details: ' + error.message + '</p>';
-                })
-                .finally(() => {
-                    loadingIndicator.style.display = 'none';
-                });
-            }
-        });
-    </script>
-</body>
+        <!-- Bootstrap CSS 파일 불러오기 -->
+        <link href="../static/css/bootstrap.min.css" rel="stylesheet" />
+        <!-- Tooplate Gymso 스타일시트 불러오기 -->
+        <link href="../static/css/tooplate-gymso-style.css" rel="stylesheet" />
+    </head>
+    <body>
+        <!-- 네비게이션 바 -->
+        <nav th:replace="~{navbar :: navbarFragment}"></nav>
+
+        <section class="hero d-flex flex-column justify-content-center align-items-center" id="home">
+            <div class="bg-overlay"></div>
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8 col-md-10 mx-auto col-12">
+                        <h2 class="text-white text-center mb-4" data-aos="fade-up" data-aos-delay="500">나만의 운동 파트너 찾기</h2>
+
+                        <div class="bg-dark text-white p-4 rounded" data-aos="fade-up" data-aos-delay="600">
+                            <div th:utext="${matchingForm}"></div>
+
+                            <div id="matchResults"></div>
+                            <div id="loadingIndicator" class="text-center mt-3" style="display: none">
+                                <div class="spinner-border text-light" role="status">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Bootstrap JS 파일 불러오기 -->
+        <script src="../static/js/jquery.min.js"></script>
+        <script src="../static/popper.min.js"></script>
+        <script src="../static/bootstrap.min.js"></script>
+        <script src="../static/js/aos.js"></script>
+        <script src="../static/js/smoothscroll.js"></script>
+        <script src="../static/js/custom.js"></script>
+        <script>
+            document.addEventListener("submit", function (e) {
+                if (e.target.action.includes("/match")) {
+                    e.preventDefault();
+
+                    const formData = new FormData(e.target);
+                    const loadingIndicator = document.getElementById("loadingIndicator");
+                    const matchResults = document.getElementById("matchResults");
+
+                    loadingIndicator.style.display = "block";
+                    matchResults.innerHTML = "";
+
+                    fetch("http://localhost:8000/match", {
+                        method: "POST",
+                        body: formData,
+                        mode: "cors",
+                    })
+                        .then((response) => response.text())
+                        .then((html) => {
+                            matchResults.innerHTML = html;
+                        })
+                        .catch((error) => {
+                            console.error("Error:", error);
+                            matchResults.innerHTML =
+                                '<p class="text-danger">매칭 결과를 가져오는 중 오류가 발생했습니다. 다시 시도해 주세요. 오류 내용: ' + error.message + "</p>";
+                        })
+                        .finally(() => {
+                            loadingIndicator.style.display = "none";
+                        });
+                }
+            });
+        </script>
+    </body>
 </html>
