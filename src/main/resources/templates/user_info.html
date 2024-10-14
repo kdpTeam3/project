@@ -1,39 +1,33 @@
 <!DOCTYPE html>
 <html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" type="text/css" th:href="@{/bootstrap.min.css}">
-    <link rel="stylesheet" type="text/css" th:href="@{/style.css}">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <!-- Bootstrap CSS 파일 불러오기 -->
+        <link href="../static/css/bootstrap.min.css" rel="stylesheet" />
+        <!-- Tooplate Gymso 스타일시트 불러오기 -->
+        <link href="../static/css/tooplate-gymso-style.css" rel="stylesheet" />
+        <title>회원 정보</title>
+    </head>
+    <body>
+        <!-- 네비게이션 바 -->
+        <nav th:replace="~{navbar :: navbarFragment}"></nav>
+        <section class="hero d-flex flex-column justify-content-center align-items-center" id="home">
+            <div class="bg-overlay"></div>
 
-    <!-- Bootstrap CSS 파일 불러오기 version 4.2.1 -->
-    <link href="../static/css/bootstrap.min.css" rel="stylesheet">
+            <div class="container my-5 d-flex justify-content-center">
+                <div class="card shadow-lg p-4" style="width: 500px">
+                    <h4 class="card-title text-center mb-4">회원 정보</h4>
+                    <p><strong>사용자 이름:</strong> <span th:text="${user?.username} ?: '알 수 없음'"></span></p>
+                    <p><strong>이메일:</strong> <span th:text="${user?.email} ?: '알 수 없음'"></span></p>
+                </div>
+            </div>
 
-    <!-- Tooplate Gymso 스타일시트 불러오기 -->
-    <link href="../static/css/tooplate-gymso-style.css" rel="stylesheet">
-    <title>회원 정보</title>
-</head>
-<body>
-    <!-- 네비게이션 바 -->
-    <nav th:replace="~{navbar :: navbarFragment}"></nav>
-<section class="hero d-flex flex-column justify-content-center align-items-center" id="home">
-    <div class="bg-overlay"></div>
-
-    <div class="container my-5 d-flex justify-content-center">
-        <div class="card shadow-lg p-4" style="width: 500px;">
-            <h4 class="card-title text-center mb-4">회원 정보</h4>
-            <p><strong>사용자 이름:</strong> <span th:text="${user?.username} ?: '알 수 없음'"></span></p>
-            <p><strong>이메일:</strong> <span th:text="${user?.email} ?: '알 수 없음'"></span></p>
-        </div>
-    </div>
-
-    <!-- 스크립트 추가 -->
-    <script th:src="@{/popper.min.js}"></script>
-    <script th:src="@{/bootstrap.min.js}"></script>
-
-    <!-- Popper.js 및 Bootstrap JavaScript 파일 4.2.1 version-->
-    <script src="../static/popper.min.js"></script>
-    <script src="../static/bootstrap.min.js"></script>
-</section>
-</body>
+            <!-- Popper.js 및 Bootstrap JavaScript 파일 4.2.1 version-->
+            <script src="../static/popper.min.js"></script>
+            <!-- Popper.js 파일 경로 -->
+            <script src="../static/bootstrap.min.js"></script>
+            <!-- Bootstrap.js 파일 경로 -->
+        </section>
+    </body>
 </html>
