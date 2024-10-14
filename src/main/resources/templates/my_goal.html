@@ -115,7 +115,7 @@
               <div class="record-item">
                 <div style="display: flex; justify-content: space-between">
                   <h5 class="mb-1" th:text="${routine.routine_name}"></h5>
-                  <h5 type="hidden" class="mb-1" th:text="${routine.getId()}"></h5>
+                  <h5 class="mb-1 sr-only" th:text="${routine.getId()}"></h5>
                   <input type="hidden" name="routine_name" value="${routine.routine_name}"/>
                   <input type="hidden" name="routine_id" value="${routine.getId()}"/>
                   <button class="btn btn-secondary mb-1" type="button"
@@ -127,7 +127,7 @@
                     <table class="workout-table">
                       <h5 class="mb-1" th:text="${workout.workout_name}"
                           style="font-weight: bold"></h5>
-                      <h5 type="hidden" th:text="${workout.getId()}"></h5>
+                      <h5 class="sr-only" th:text="${workout.getId()}"></h5>
                       <tr>
                         <td>세트</td>
                         <td>무게</td>
@@ -136,14 +136,15 @@
                       </tr>
                       <tr class="workout-table-tr">
                         <td style="width:50px ">
-                          <p class="mb-1 workout-sets" name = "sets-id[]">1</p>
+                          <p class="mb-1 workout-sets" name="sets-id[]">1</p>
                         </td>
                         <td style="width: 100px"><input class="workout-record-input"
                                                         type="number" name="weight[]"></td>
                         <td style="width: 100px"><input class="workout-record-input"
                                                         type="number" name="reps[]"></td>
                         <td style="width: 20px">
-                          <button class="btn" type="button" onclick="removeSet(this)">
+                          <button class="btn xbtn" style="visibility: hidden" type="button"
+                                  onclick="removeSet(this)">
                             &times;
                           </button>
                         </td>
@@ -244,16 +245,22 @@
             <input class="workout-record-input" type="number" name="reps[]">
         </td>
         <td style="width: 20px">
-            <button class="btn" onclick="removeSet(this)">&times;</button>
+            <button class="btn xbtn" onclick="removeSet(this)">&times;</button>
         </td>
     `;
     workoutTable.appendChild(newRow);
+    updateSetNumbers(workoutItem);
   }
 
   // 세트 제거
   function removeSet(button) {
-    const workoutItem = button.closest('.workout-table-tr');
-    workoutItem.remove();
+    const workoutItem = button.closest('.workout-item'); // workout-item 찾기
+    const workoutTableRow = button.closest('.workout-table-tr'); // 세트 행 찾기
+
+    if (workoutTableRow) {
+      workoutTableRow.remove(); // 현재 세트 제거
+      updateSetNumbers(workoutItem); // 세트 번호 업데이트
+    }
   }
 
   // 루틴 기록
@@ -263,7 +270,6 @@
     const routineDiv = selectedRoutine.querySelectorAll('h5');
     const routineName = routineDiv[0].innerText;
     const routineId = routineDiv[1].innerText;
-
 
     const date = selected_date;
     const workouts = [];
@@ -288,7 +294,7 @@
 
       workouts.push({
         workout_name: workoutName,
-        id : workoutId,
+        id: workoutId,
         workoutSet: sets
       });
     });
@@ -296,11 +302,9 @@
     const routineData = {
       date: date,
       routine_name: routineName,
-      id : routineId,
+      id: routineId,
       workouts: workouts
     };
-
-    console.log(routineData);
 
     // AJAX 요청을 통해 서버에 데이터 전송
     fetch('/workout/record_routine', {
@@ -326,73 +330,29 @@
     });
   }
 
-  // function saveRoutine(recordElement) {
-  //   const routineName = recordElement.querySelector('h5').innerText;
-  //   const weightInputs = recordElement.querySelectorAll('input[name="weight[]"]');
-  //   const repsInputs = recordElement.querySelectorAll('input[name="reps[]"]');
-  //
-  //   const workoutSets = [];
-  //
-  //   weightInputs.forEach((input, index) => {
-  //     const weight = input.value;
-  //     const reps = repsInputs[index].value;
-  //
-  //     if (weight && reps) {
-  //       workoutSets.push({ weight: weight, reps: reps });
-  //     }
-  //   });
-  //
-  //
-  //   const routineData = {
-  //     routine_name: routineName,
-  //     date: selected_date,
-  //     workoutSets: workoutSets
-  //   };
-  //
-  //   console.log(routineData);
-  //   // AJAX 요청을 통해 서버에 데이터 전송
-  //   fetch('/workout/record_routine', {
-  //     method: 'POST',
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //       'X-CSRF-Token': document.getElementById('csrfToken').value // CSRF 토큰
-  //     },
-  //     body: JSON.stringify(routineData)
-  //   })
-  //   .then(response => {
-  //     if (response.ok) {
-  //       alert('루틴이 성공적으로 저장되었습니다.');
-  //       // 모달 닫기 및 페이지 새로 고침 등의 추가 로직
-  //       $('#routineModal').modal('hide');
-  //       location.reload();
-  //     } else {
-  //       alert('저장하는 동안 오류가 발생했습니다.');
-  //     }
-  //   })
-  //   .catch(error => {
-  //     console.error('Error:', error);
-  //     alert('저장하는 동안 오류가 발생했습니다.');
-  //   });
-  // }
-
-
   function closeModal() {
     var modal = new bootstrap.Modal(document.getElementById('routineModal'));
     modal.hide();
   }
 
   // 세트번호 업데이트
-  // function updateSetNumbers(table) {
-  //
-  //     const rows = table.querySelectorAll('.workout-table-tr'); // 모든 세트 행 가져오기
-  //
-  //     for (let i = 0; i < rows.length; i++) {
-  //         const cell = rows[i].cells[0]; // 첫 번째 셀 (세트 번호) 가져오기
-  //         if (cell) {
-  //             cell.textContent = i + 1; // 세트 번호를 1부터 시작하도록 설정
-  //         }
-  //     }
-  // }
+  function updateSetNumbers(workoutContainer) {
+    const rows = workoutContainer.querySelectorAll('.workout-table-tr'); // 모든 세트 행 가져오기
+    const xbtn = workoutContainer.getElementsByClassName('xbtn');
+
+    if (rows.length <= 1) {
+      xbtn[0].style.visibility = 'hidden';
+    } else {
+      xbtn[0].style.visibility = 'visible';
+    }
+
+    rows.forEach((row, index) => {
+      const cell = row.querySelector('.workout-sets'); // 세트 번호를 표시하는 셀
+      if (cell) {
+        cell.textContent = index + 1; // 세트 번호를 1부터 시작하도록 설정
+      }
+    });
+  }
 
   function showCalendar() {
     let monthCnt = 100;
