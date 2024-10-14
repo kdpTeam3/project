@@ -35,30 +35,5 @@ public class RoutineService {
 ////        SiteUser user = userService.findByUsername(username); // 사용자를 찾음
 ////        return routineRepository.findRoutinesBySiteUserUsername(principal.getName()); // 해당 사용자의 루틴 목록 반환
 //    }
-    public void saveRoutine(RoutineUpdateDto routineUpdateDto){
-        Routine routine = new Routine();
-        routine.setRoutine_name(routineUpdateDto.getRoutine_name());
 
-        routine = routineRepository.save(routine);
-
-        for(WorkoutUpdateDto workoutUpdateDto : routineUpdateDto.getWorkouts()){
-            Workout workout = new Workout();
-            workout.setRoutine(routine);
-            workout.setWorkout_name(workoutUpdateDto.getWorkout_name());
-
-            // 운동 저장
-            workout = workoutRepository.save(workout);
-
-            for(WorkoutSetUpdateDto workoutSetUpdateDto : workoutUpdateDto.getWorkoutSet()){
-                WorkoutSet workoutSet = new WorkoutSet();
-                workoutSet.setWorkout(workout);
-                workoutSet.setWeight(workoutSetUpdateDto.getWeight());
-                workoutSet.setReps(workoutSetUpdateDto.getReps());
-
-                // 세트 저장
-                workoutSetRepository.save(workoutSet);
-            }
-
-        }
-    }
 }

@@ -12,6 +12,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.Data;
 
@@ -38,7 +39,8 @@ public class Routine {
   private String routine_name;
 
   @OneToMany(mappedBy = "routine", cascade = CascadeType.ALL, orphanRemoval = true)
-  private List<Workout> workouts;
+  private List<Workout> workouts = new ArrayList<>();
+
 
   public Routine() {
   }
