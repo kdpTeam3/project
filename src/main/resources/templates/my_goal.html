@@ -30,6 +30,8 @@
       cursor: pointer;
       background: #A0D683;
     }
+
+
   </style>
 </head>
 <body>
@@ -96,7 +98,8 @@
         <div class="routine-content">
           <div class="routine-list" th:each="routine : ${routines}"
                onclick="displaySelectedRoutine(this)">
-            <h5 class="mb-1" th:text="${routine.routine_name}" th:id="${routine.getId()}"></h5>
+            <p id="userName" class="sr-only" th:text="${routine.siteUser.username}"></p>
+            <h5 class="mb-1" th:text="${routine.routine_name}" th:id="${routine.routineNum}"></h5>
             <div class="routine-list-item">
               <div th:each="workout : ${routine.workouts}">
                 <p class="mb-1"
@@ -111,13 +114,13 @@
 
         <div class="modal-body d-none" id="modal-body-make-routine">
           <div id="routine" th:each="routine : ${routines}">
-            <div class="record" th:id="record+${routine.getId()}">
+            <div class="record" th:id="record+${routine.routineNum}">
               <div class="record-item">
                 <div style="display: flex; justify-content: space-between">
                   <h5 class="mb-1" th:text="${routine.routine_name}"></h5>
-                  <h5 class="mb-1 sr-only" th:text="${routine.getId()}"></h5>
+                  <h5 class="mb-1 sr-only" th:text="${routine.routineNum}"></h5>
                   <input type="hidden" name="routine_name" value="${routine.routine_name}"/>
-                  <input type="hidden" name="routine_id" value="${routine.getId()}"/>
+                  <input type="hidden" name="routine_id" value="${routine.routineNum}"/>
                   <button class="btn btn-secondary mb-1" type="button"
                           onclick="switchToRoutineList()"><-
                   </button>
@@ -127,7 +130,7 @@
                     <table class="workout-table">
                       <h5 class="mb-1" th:text="${workout.workout_name}"
                           style="font-weight: bold"></h5>
-                      <h5 class="sr-only" th:text="${workout.getId()}"></h5>
+                      <h5 class="sr-only" th:text="${workout.workoutNum}"></h5>
                       <tr>
                         <td>세트</td>
                         <td>무게</td>
@@ -169,7 +172,7 @@
 </div>
 
 
-<script th:inline="javascript">
+<script th:inline="javascript" defer>
   var currentTitle = document.getElementById("current-year-month");
   var calendarBody = document.getElementById("calendar-body");
   var mainDay = document.getElementById("main-day");
@@ -182,8 +185,12 @@
   var leapYear = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
   var notLeapYear = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
   var pageYear;
-  var selected_date;
+  var initDate = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate();
+  var selected_date = initDate;
   var routineId;
+  var userName = document.getElementById("userName").innerText;
+  var completedDates = [[${completedDates}]];
+  console.log(userName);
 
   if (first.getFullYear() % 4 === 0) {
     pageYear = leapYear;
@@ -300,10 +307,12 @@
     });
 
     const routineData = {
+      id: routineId,
       date: date,
       routine_name: routineName,
-      id: routineId,
-      workouts: workouts
+      workouts: workouts,
+      workout_completed: true,
+      username: userName
     };
 
     // AJAX 요청을 통해 서버에 데이터 전송
@@ -316,10 +325,15 @@
       body: JSON.stringify(routineData) // routineData 객체를 전송
     })
     .then(response => {
-      console.log(response);
       if (response.ok) {
+
+        const calendarCell = document.getElementById(selected_date.split('-')[2]);
+        // console.log(calendarCell);
         alert('운동 기록이 저장되었습니다!');
-        location.reload(); // 페이지 새로고침
+        calendarCell.classList.add('workout-completed');
+
+        // location.reload(); // 페이지 새로고침
+        workoutCompleted();
       } else {
         alert('운동 기록 저장에 실패했습니다.');
       }
@@ -328,8 +342,22 @@
       console.error('Error:', error);
       alert('저장 중 오류가 발생했습니다.');
     });
+
+    // 달력에 루틴 표시 함수
   }
 
+  function workoutCompleted() {
+    // const dateTd = document.getElementById('current-year-month').innerText;
+    // const month = dateTd.split(' ')[0];
+    // const monthNum = monthList.findIndex(m => m === month) + 1;
+    // const yearNum = dateTd.split(' ')[1];
+
+    const date = selected_date;
+
+
+  }
+
+  // 모달 닫기
   function closeModal() {
     var modal = new bootstrap.Modal(document.getElementById('routineModal'));
     modal.hide();
@@ -368,10 +396,18 @@
           var $td = document.createElement("td");
           $td.textContent = cnt;
           $td.setAttribute("id", cnt);
+
+          // 운동 완료 날짜 하이라이트
+          // var currentDate = `${first.getFullYear()}-${first.getMonth() + 1}-${cnt}`;
+          // if (completedDates.includes(currentDate)) {
+          //   $td.classList.add("workout-completed");
+          // }
+
           if (cnt === today.getDate() && first.getMonth() === today.getMonth()
               && first.getFullYear() === today.getFullYear()) {
             $td.classList.add("active");
           }
+
           $tr.appendChild($td);
           cnt++;
         }
@@ -426,13 +462,17 @@
   calendarBody.addEventListener("click", function (e) {
     if (e.target.tagName === "TD" && e.target.textContent !== "") {
       let active = document.querySelector(".active")
-      selected_date = first.getFullYear() + '-' + first.getMonth() + '-' + e.target.textContent;
+      selected_date = first.getFullYear() + '-' + (first.getMonth() + 1) + '-'
+          + e.target.textContent;
       if (active) {
         active.classList.remove("active");
       }
       e.target.classList.add("active");
       today = new Date(first.getFullYear(), first.getMonth(), e.target.textContent);
+
       console.log(selected_date);
+      console.log(completedDates);
+
       showMain();
       loadTodoList();
     }
@@ -527,6 +567,8 @@
   }
 
   loadTodoList();
+
+
 </script>
 <!-- Popper.js 및 Bootstrap JS 추가 -->
 <script th:src="@{/popper.min.js}"></script>

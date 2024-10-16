@@ -2,7 +2,11 @@ package com.mysite.sbb.workout_tab;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mysite.sbb.user.SiteUser;
+import com.mysite.sbb.user.UserRepository;
 import com.mysite.sbb.user.UserService;
+import com.mysite.sbb.workout_tab.recordDate.RecordDate;
+import com.mysite.sbb.workout_tab.recordDate.RecordDateRepository;
+import com.mysite.sbb.workout_tab.recordDate.RecordDateService;
 import com.mysite.sbb.workout_tab.routine.Routine;
 import com.mysite.sbb.workout_tab.routine.RoutineRepository;
 import com.mysite.sbb.workout_tab.routine.RoutineService;
@@ -19,6 +23,8 @@ import com.mysite.sbb.workout_tab.workoutSet.WorkoutSetUpdateDto;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import java.security.Principal;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -50,13 +56,9 @@ public class WorkoutController {
   private final RoutineRepository routineRepository;
   private final WorkoutRepository workoutRepository;
   private final WorkoutSetRepository workoutSetRepository;
+  private final RecordDateRepository recordDateRepository;
+  private final RecordDateService recordDateService;
 
-//    public WorkoutController(UserService userService, RoutineService routineService, WorkoutService workoutService, WorkoutSetService workoutSetService) {
-//        this.userService = userService;
-//        this.routineService = routineService;
-//        this.workoutService = workoutService;
-//        this.workoutSetService = workoutSetService;
-//    }
 
   // 운동 가이드
   @GetMapping("/guide")
@@ -143,68 +145,15 @@ public class WorkoutController {
     return "redirect:my_routine"; // 리다이렉션
   }
 
-  // 루틴 데이터 처리
-//    @PreAuthorize("isAuthenticated()")
-//    @PostMapping("/record_routine")
-//    public String recordRoutinePost(Model model, RoutineUpdateDto routineUpdateDto,
-//                                  Principal principal) {
-//
-//        try {
-//            // 로그인한 사용자 가져오기
-//            SiteUser siteUser = userService.findByUsername(principal.getName());
-//
-//            // 루틴 생성
-//            Routine routine = new Routine();
-//            routine.setSiteUser(siteUser);
-//            routine.setRoutine_name(routineUpdateDto.getRoutine_name());
-//
-//            // 루틴 저장
-//            routineService.save(routine);
-//
-//            // 운동과 세트 저장
-//            for (WorkoutUpdateDto workoutUpdateDto : routineUpdateDto.getWorkouts()) {
-//                Workout workout = new Workout();
-//
-//                workout.setRoutine(routine);
-//                workout.setWorkout_name(workoutUpdateDto.getWorkout_name());
-//
-//                // 세트 저장
-//                for (WorkoutSetUpdateDto setUpdateDto : workoutUpdateDto.getWorkoutSet()) {
-//                    WorkoutSet workoutSet = new WorkoutSet();
-//                    workoutSet.setWorkout(workout);
-//                    workoutSet.setWeight(setUpdateDto.getWeight());
-//                    workoutSet.setReps(setUpdateDto.getReps());
-//
-//                    // 세트 저장
-//                    workout.getWorkoutSet().add(workoutSet);
-//                }
-//
-//                // 운동 저장
-//                workoutService.save(workout);
-//            }
-//
-//            model.addAttribute("message", "루틴이 저장되었습니다");
-//            return "redirect:my_goal"; // 리다이렉션
-//        } catch (Exception e) {
-//            model.addAttribute("message", "루틴 저장 중 오류가 발생했습니다" + e.getMessage());
-//            return "/my_goal";
-//        }
-//    }
-
 
   @Transactional
   @PreAuthorize("isAuthenticated()")
   @PostMapping("/record_routine")
-  public ResponseEntity<String> recordRoutine(@Valid @RequestBody RoutineUpdateDto routineUpdateDto,
+  public ResponseEntity<String> recordRoutine(@RequestBody RoutineUpdateDto routineUpdateDto,
       Principal principal) {
     try {
       // 사용자 정보 가져오기
       SiteUser siteUser = userService.findByUsername(principal.getName());
-
-      //기존 루틴 찾기 (ID로)
-//      Routine routine = routineUpdateDto.getId() != null
-//          ? routineService.findById(routineUpdateDto.getId()).orElse(new Routine())
-//          : new Routine();
 
       Routine routine;
       if (routineUpdateDto.getId() != null) {
@@ -215,6 +164,7 @@ public class WorkoutController {
         // 기존 운동 세트와 운동 삭제
         workoutSetRepository.deleteByWorkoutIn(workoutRepository.findByRoutine(routine));
         workoutRepository.deleteByRoutine(routine);
+
       } else {
         // 새로운 루틴 생성
         routine = new Routine();
@@ -255,6 +205,22 @@ public class WorkoutController {
           workoutSetRepository.save(workoutSet);
         }
       }
+
+      // 날짜 데이터 저장
+
+      if (recordDateRepository.findByDate(LocalDate.parse(routineUpdateDto.getDate()))
+          .isPresent()) {
+        recordDateRepository.updateDate(routine.getRoutineNum());
+      } else {
+
+        RecordDate recordDate = new RecordDate();
+        recordDate.setDate(LocalDate.parse(routineUpdateDto.getDate()));
+        recordDate.setWorkoutCompleted(true);
+        recordDate.setRoutine(routine);
+        recordDate.setSiteUser(siteUser);
+        recordDateRepository.save(recordDate);
+      }
+
       return ResponseEntity.ok("운동 기록이 저장되었습니다."); // 성공 응답
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -297,8 +263,23 @@ public class WorkoutController {
   @PreAuthorize("isAuthenticated()")
   @GetMapping("/my_goal")
   public String myGoal(Model model, Principal principal) {
+
+    // 사용자 정보 가져오기
+    SiteUser siteUser;
+
+    // 사용자의 루틴 리스트 가져오기
     List<Routine> routines = routineRepository.findRoutinesBySiteUserUsername(principal.getName());
+    for (Routine routine : routines) {
+      siteUser = userService.findByUsername(routine.getSiteUser().getUsername());
+      routine.setSiteUser(siteUser);
+      System.out.println("siteUser : " + siteUser);
+    }
+
+    // 사용자의 운동 완료 날짜 리스트 가져오기
+
+    // 모델에 추가
     model.addAttribute("routines", routines);
+//    model.addAttribute("completedDates", completedDates);
     return "my_goal";
   }
 

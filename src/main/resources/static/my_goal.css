@@ -327,14 +327,20 @@ body {
     margin-bottom: 10px;
 
   }
-  .sr-only{
+
+  .sr-only {
     position: absolute;
     overflow: hidden;
     width: 1px;
     height: 1px;
     margin: -1px;
     border: 0;
-    clip: rect(0,0,0,0);
+    clip: rect(0, 0, 0, 0);
+  }
+
+  .workout-completed {
+    background-color: #d1e7dd;
+    border: 2px solid green;
   }
 
 }

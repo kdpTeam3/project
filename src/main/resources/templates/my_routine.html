@@ -25,7 +25,7 @@
         <div class="list-group-item" th:each="routine : ${routines}">
           <div style="display: flex; justify-content: space-between">
             <h5 class="mb-1" th:text="${routine.routine_name}">루틴 이름</h5>
-            <p class="routineId" style="display: none" th:text="${routine.getId()}">id</p>
+            <p class="routineId" style="display: none" th:text="${routine.routineNum}">id</p>
             <button class="btn btn-danger delete-workout" onclick="deleteRoutine(this)">
               삭제
             </button>

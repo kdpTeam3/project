@@ -15,6 +15,8 @@ import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Data;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 
 @Data
@@ -23,11 +25,12 @@ public class Routine {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  private Long routineNum;
 
   @ManyToOne
   @NotNull
-  @JoinColumn(name = "user_id")
+  @JoinColumn(name = "username", referencedColumnName = "username")
+  @OnDelete(action = OnDeleteAction.CASCADE)
   private SiteUser siteUser;
 
 

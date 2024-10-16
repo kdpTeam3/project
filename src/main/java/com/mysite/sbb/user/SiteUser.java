@@ -20,7 +20,7 @@ public class SiteUser {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String userId;
+//    private String userId;
 
     @Column(unique = true)
     private String username;
