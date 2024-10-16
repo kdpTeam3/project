@@ -26,8 +26,7 @@
 
                             <div id="matchResults"></div>
                             <div id="loadingIndicator" class="text-center mt-3" style="display: none">
-                                <div class="spinner-border text-light" role="status">
-                                </div>
+                                <div class="spinner-border text-light" role="status"></div>
                             </div>
                         </div>
                     </div>
@@ -43,36 +42,53 @@
         <script src="../static/js/smoothscroll.js"></script>
         <script src="../static/js/custom.js"></script>
         <script>
-            document.addEventListener("submit", function (e) {
-                if (e.target.action.includes("/match")) {
-                    e.preventDefault();
-
-                    const formData = new FormData(e.target);
-                    const loadingIndicator = document.getElementById("loadingIndicator");
-                    const matchResults = document.getElementById("matchResults");
-
-                    loadingIndicator.style.display = "block";
-                    matchResults.innerHTML = "";
-
-                    fetch("http://localhost:8000/match", {
-                        method: "POST",
-                        body: formData,
-                        mode: "cors",
-                    })
-                        .then((response) => response.text())
-                        .then((html) => {
-                            matchResults.innerHTML = html;
-                        })
-                        .catch((error) => {
-                            console.error("Error:", error);
-                            matchResults.innerHTML =
-                                '<p class="text-danger">매칭 결과를 가져오는 중 오류가 발생했습니다. 다시 시도해 주세요. 오류 내용: ' + error.message + "</p>";
-                        })
-                        .finally(() => {
-                            loadingIndicator.style.display = "none";
-                        });
+            document.addEventListener("DOMContentLoaded", function () {
+                const form = document.querySelector('form[action*="/match"]');
+                if (form) {
+                    form.addEventListener("submit", submitForm);
                 }
             });
+
+            function submitForm(event) {
+                event.preventDefault();
+                const formData = new FormData(event.target);
+                fetchMatchResults("http://localhost:8000/match", formData);
+            }
+
+            function loadPage(userId, page) {
+                fetchMatchResults(`http://localhost:8000/match/${userId}/${page}`);
+            }
+
+            function fetchMatchResults(url, formData = null) {
+                const loadingIndicator = document.getElementById("loadingIndicator");
+                const matchResults = document.getElementById("matchResults");
+
+                loadingIndicator.style.display = "block";
+                matchResults.innerHTML = "";
+
+                const fetchOptions = {
+                    method: formData ? "POST" : "GET",
+                    mode: "cors",
+                };
+
+                if (formData) {
+                    fetchOptions.body = formData;
+                }
+
+                fetch(url, fetchOptions)
+                    .then((response) => response.text())
+                    .then((html) => {
+                        matchResults.innerHTML = html;
+                    })
+                    .catch((error) => {
+                        console.error("Error:", error);
+                        matchResults.innerHTML =
+                            '<p class="text-danger">매칭 결과를 가져오는 중 오류가 발생했습니다. 다시 시도해 주세요. 오류 내용: ' + error.message + "</p>";
+                    })
+                    .finally(() => {
+                        loadingIndicator.style.display = "none";
+                    });
+            }
         </script>
     </body>
 </html>
