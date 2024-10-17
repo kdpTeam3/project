@@ -19,7 +19,6 @@ public interface RecordDateRepository extends JpaRepository<RecordDate, Long> {
   Optional<RecordDate> findByDate(LocalDate date);
 
   @Modifying
-  @Query("update RecordDate rd set rd.routine.routineNum = :routine")
-  void updateDate(@Param("routine") Long routine);
-
+  @Query("update RecordDate rd set rd.routine.routineNum = :routine where rd.date = :date ")
+  void updateDate(@Param("routine") Long routine, @Param("date")  LocalDate date);
 }

@@ -210,7 +210,7 @@ public class WorkoutController {
 
       if (recordDateRepository.findByDate(LocalDate.parse(routineUpdateDto.getDate()))
           .isPresent()) {
-        recordDateRepository.updateDate(routine.getRoutineNum());
+        recordDateRepository.updateDate(routine.getRoutineNum(), LocalDate.parse(routineUpdateDto.getDate()));
       } else {
 
         RecordDate recordDate = new RecordDate();
