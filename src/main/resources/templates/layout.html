@@ -6,28 +6,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width , initial-scale=1, shrink-to-fit=no">
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" type="text/css" th:href="@{/bootstrap.min.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/static/bootstrap.min.css}">
     <!-- sbb CSS -->
-    <link rel="stylesheet" type="text/css" th:href="@{/style.css}">
+    <link rel="stylesheet" type="text/css" th:href="@{/static/style.css}">
     <title>Fitness</title>
+
+    <link th:href="@{/static/css/bootstrap.min.css}" rel="stylesheet"> <!-- 절대 경로로 변경 -->
+    <link th:href="@{/static/css/tooplate-gymso-style.css}" rel="stylesheet"> <!-- 절대 경로로 변경 -->
 </head>
 
 <body>
 
     <!-- 내비게이션 바 -->
     <nav th:replace="~{navbar :: navbarFragment}"></nav>
+    <div class="hero d-flex flex-column justify-content-center align-items-center" id="home" style="position: relative; z-index: 0;">
+        <!-- 오버레이 -->
+        <div class="bg-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 1;"></div>
+        
+        <!-- 텍스트나 이미지 내용 -->
+        <div class="content-section" style="z-index: 2;">
+            <!-- 기본 템플릿 안에 삽입될 내용 Start -->
+            <th:block layout:fragment="content"></th:block>
+            <!-- 기본 템플릿 안에 삽입될 내용 End -->
+        </div>
+    </div>
+    
 
-    <!-- 기본 템플릿 안에 삽입될 내용 Start -->
-    <th:block layout:fragment="content"></th:block>
-    <!-- 기본 템플릿 안에 삽입될 내용 End -->
-
-    <!-- Popper.js 및 Bootstrap JS -->
-    <script th:src="@{/popper.min.js}"></script> <!-- Popper.js 추가 -->
-    <script th:src="@{/bootstrap.min.js}"></script> <!-- Bootstrap JS 추가 -->
-
-    <!-- 자바스크립트 Start -->
-    <th:block layout:fragment="script"></th:block>
-    <!-- 자바스크립트 End -->
+    <!-- Popper.js 및 Bootstrap JavaScript 파일 4.2.1 version-->
+    <script th:src="@{/static/popper.min.js}"></script>
+    <script th:src="@{/static/bootstrap.min.js}"></script>
 </body>
 
 </html>

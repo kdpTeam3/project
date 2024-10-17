@@ -1,66 +1,42 @@
 <!DOCTYPE html>
 <html lang="ko">
-    <head>
-        <meta charset="UTF-8" />
-        <title>Fitness</title>
-        <link
-            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-            rel="stylesheet"
-            integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
-            crossorigin="anonymous"
-        />
-    </head>
-    <body class="bg-dark text-white">
-        <!-- 네비게이션 바 -->
-        <nav th:replace="~{navbar :: navbarFragment}"></nav>
+<head>
+    <meta charset="UTF-8">
+    <title>Fitness</title>
 
-        <!-- 메인 헤더 섹션 -->
-        <div
-            class="container-fluid text-center bg-dark text-white py-5"
-            style="background-image: url('path_to_your_fitness_image.jpg'); background-size: cover"
-        >
-            <h1 class="display-1 fw-bold">Fitness</h1>
-            <p class="lead">당신의 건강과 피트니스를 위한 최고의 파트너</p>
-            <a href="/user/login" class="btn btn-outline-light btn-lg">Get Started</a>
-        </div>
+    <!-- Bootstrap CSS 파일 불러오기 -->
+    <link href="../static/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Tooplate Gymso 스타일시트 불러오기 -->
+    <link href="../static/css/tooplate-gymso-style.css" rel="stylesheet">
 
-        <!-- 대시보드 섹션 -->
-        <div class="container my-5">
-            <div class="row text-center">
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="card bg-dark text-white border-0">
-                        <div class="card-body">
-                            <h5 class="card-title">나만의 루틴</h5>
-                            <p class="card-text">당신만의 운동 계획을 세우세요.</p>
-                            <a href="/workout/my_routine" class="btn btn-outline-light">자세히 보기</a>
+</head>
+<body>
+
+<!-- 네비게이션 바 -->
+<nav th:replace="~{navbar :: navbarFragment}"></nav>
+
+<!-- HERO -->
+<section class="hero d-flex flex-column justify-content-center align-items-center" id="home">
+
+    <div class="bg-overlay"></div>
+
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-md-10 mx-auto col-12">
+                    <div class="hero-text mt-5 text-center">
+                        <h6 data-aos="fade-up" data-aos-delay="300">new way to build a healthy lifestyle!</h6>
+                        <h1 class="text-white" data-aos="fade-up" data-aos-delay="500">Upgrade your body at Gymso Fitness</h1>
+                        <a href="#feature" class="btn custom-btn mt-3" data-aos="fade-up" data-aos-delay="600">Get started</a>
+                        <a href="#about" class="btn custom-btn bordered mt-3" data-aos="fade-up" data-aos-delay="700">learn more</a>                               
                         </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="card bg-dark text-white border-0">
-                        <div class="card-body">
-                            <h5 class="card-title">식단 추천</h5>
-                            <p class="card-text">AI를 이용한 당신만의 식단을 추천해드립니다.</p>
-                            <a href="#" class="btn btn-outline-light">자세히 보기</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="card bg-dark text-white border-0">
-                        <div class="card-body">
-                            <h5 class="card-title">헬스 파트너 매칭</h5>
-                            <p class="card-text">혼자서 하기 어렵다면, 같이 해보는건 어떨까요?</p>
-                            <a href="/matching" class="btn btn-outline-light mt-3">자세히 보기</a>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
+</section>
 
-        <script
-            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-            crossorigin="anonymous"
-        ></script>
-    </body>
+<!-- Bootstrap JS 파일 불러오기 -->
+<script src="../static/popper.min.js"></script>
+<script src="../static/bootstrap.min.js"></script> <!-- Bootstrap.js 파일 경로 -->
+
+</body>
 </html>

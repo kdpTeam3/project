@@ -1,5 +1,10 @@
 <!-- 전체 웹 페이지의 틀을 설정하는 부분 -->
 <html layout:decorate="~{layout}">
+<head>
+    <link href="../static/css/bootstrap.min.css" rel="stylesheet"> <!-- Bootstrap CSS 파일 경로 -->
+    <link href="../static/css/tooplate-gymso-style.css" rel="stylesheet"> <!-- 사용자 정의 CSS 파일 경로 -->
+</head>
+<body>
     <!-- 웹 페이지의 특정 부분(여기서는 'content'라는 부분)을 채우는 역할 -->
     <div layout:fragment="content" class="container my-5">
         <!-- 질문 등록 버튼과 제목을 가운데 정렬 -->
@@ -44,4 +49,8 @@
             </div>
         </div>
     </div>
+    <!-- Popper.js 및 Bootstrap JavaScript 파일 4.2.1 version-->
+    <script src="../static/popper.min.js"></script> <!-- Popper.js 파일 경로 -->
+    <script src="../static/bootstrap.min.js"></script> <!-- Bootstrap.js 파일 경로 -->
+</body>
 </html>
