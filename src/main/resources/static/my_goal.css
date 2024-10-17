@@ -339,8 +339,7 @@ body {
   }
 
   .workout-completed {
-    background-color: #d1e7dd;
-    border: 2px solid green;
+    background-image: url("/static/images/workout_completed_icon.png");
   }
 
 }

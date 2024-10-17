@@ -31,6 +31,10 @@
       background: #A0D683;
     }
 
+    .workout-completed {
+      background-image: url("/images/workout_completed_icon.png");
+    }
+
 
   </style>
 </head>
@@ -170,6 +174,9 @@
     </div>
   </div>
 </div>
+<div id="test" th:each="completeDate : ${completedDates}">
+  <input type="hidden" th:value="${completeDate}" class="completeDate">
+</div>
 
 
 <script th:inline="javascript" defer>
@@ -189,7 +196,6 @@
   var selected_date = initDate;
   var routineId;
   var userName = document.getElementById("userName").innerText;
-  var completedDates = [[${completedDates}]];
   console.log(userName);
 
   if (first.getFullYear() % 4 === 0) {
@@ -197,8 +203,6 @@
   } else {
     pageYear = notLeapYear;
   }
-
-  // test
 
   function displaySelectedRoutine(element) {
     const routineH5 = element.querySelector('h5');
@@ -330,12 +334,10 @@
       if (response.ok) {
 
         const calendarCell = document.getElementById(selected_date.split('-')[2]);
-        // console.log(calendarCell);
-        alert('운동 기록이 저장되었습니다!');
         calendarCell.classList.add('workout-completed');
+        alert('운동 기록이 저장되었습니다!');
 
-        // location.reload(); // 페이지 새로고침
-        workoutCompleted();
+        location.reload(); // 페이지 새로고침
       } else {
         alert('운동 기록 저장에 실패했습니다.');
       }
@@ -349,13 +351,25 @@
   }
 
   function workoutCompleted() {
-    // const dateTd = document.getElementById('current-year-month').innerText;
-    // const month = dateTd.split(' ')[0];
-    // const monthNum = monthList.findIndex(m => m === month) + 1;
-    // const yearNum = dateTd.split(' ')[1];
+    const dateTd = document.getElementById('current-year-month').innerText;
+    const month = dateTd.split(' ')[0];
+    const monthNum = monthList.findIndex(m => m === month) + 1;
+    console.log(monthNum);
+    const yearNum = dateTd.split(' ')[1];
+    const tbody = document.getElementById('calendar-body');
+    const dayTds = tbody.querySelectorAll("td");
 
-    const date = selected_date;
+    document.querySelectorAll(".completeDate").forEach(date => {
+      var year = date.value.split("-")[0]
+      var month = date.value.split("-")[1]
+      var day = date.value.split("-")[2]
 
+      dayTds.forEach(dayTd => {
+        if (yearNum == year && monthNum == month && dayTd.id == day) {
+          dayTd.classList.add('workout-completed');
+        }
+      });
+    });
 
   }
 
@@ -397,13 +411,11 @@
         } else {
           var $td = document.createElement("td");
           $td.textContent = cnt;
-          $td.setAttribute("id", cnt);
-
-          // 운동 완료 날짜 하이라이트
-          // var currentDate = `${first.getFullYear()}-${first.getMonth() + 1}-${cnt}`;
-          // if (completedDates.includes(currentDate)) {
-          //   $td.classList.add("workout-completed");
-          // }
+          if (cnt < 10) {
+            $td.setAttribute("id", "0" + cnt);
+          } else {
+            $td.setAttribute("id", cnt);
+          }
 
           if (cnt === today.getDate() && first.getMonth() === today.getMonth()
               && first.getFullYear() === today.getFullYear()) {
@@ -417,6 +429,8 @@
       monthCnt++;
       calendarBody.appendChild($tr);
     }
+    // 운동 완료 날짜 하이라이트
+    workoutCompleted();
   }
 
   function removeCalendar() {
@@ -435,29 +449,30 @@
     mainDate.innerHTML = today.getDate();
   }
 
-  showCalendar();
-  showMain();
+  console.log("showCalendar 실행");
 
   // 현재 년월 표시
   currentTitle.textContent = monthList[first.getMonth()] + " " + first.getFullYear();
+  showCalendar();
+  showMain();
 
   // 이전 달, 다음 달 이동
   document.getElementById("prev").addEventListener("click", function () {
     removeCalendar();
     today = new Date(first.getFullYear(), first.getMonth() - 1, today.getDate());
     first = new Date(today.getFullYear(), today.getMonth(), 1);
+    currentTitle.textContent = monthList[first.getMonth()] + " " + first.getFullYear();
     showCalendar();
     showMain();
-    currentTitle.textContent = monthList[first.getMonth()] + " " + first.getFullYear();
   });
 
   document.getElementById("next").addEventListener("click", function () {
     removeCalendar();
     today = new Date(first.getFullYear(), first.getMonth() + 1, today.getDate());
     first = new Date(today.getFullYear(), today.getMonth(), 1);
+    currentTitle.textContent = monthList[first.getMonth()] + " " + first.getFullYear();
     showCalendar();
     showMain();
-    currentTitle.textContent = monthList[first.getMonth()] + " " + first.getFullYear();
   });
 
   // 날짜 클릭 이벤트
@@ -465,7 +480,7 @@
     if (e.target.tagName === "TD" && e.target.textContent !== "") {
       let active = document.querySelector(".active")
       selected_date = first.getFullYear() + '-' + (first.getMonth() + 1) + '-'
-          + e.target.textContent;
+          + e.target.id;
       if (active) {
         active.classList.remove("active");
       }
@@ -473,7 +488,6 @@
       today = new Date(first.getFullYear(), first.getMonth(), e.target.textContent);
 
       console.log(selected_date);
-      console.log(completedDates);
 
       showMain();
       loadTodoList();

@@ -26,6 +26,7 @@ import java.security.Principal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
@@ -276,10 +277,12 @@ public class WorkoutController {
     }
 
     // 사용자의 운동 완료 날짜 리스트 가져오기
+    List<LocalDate> completedDates = recordDateRepository.selectDate(principal.getName());
 
     // 모델에 추가
     model.addAttribute("routines", routines);
-//    model.addAttribute("completedDates", completedDates);
+    model.addAttribute("completedDates", completedDates);
+
     return "my_goal";
   }
 

@@ -14,11 +14,18 @@ import org.springframework.data.repository.query.Param;
 public interface RecordDateRepository extends JpaRepository<RecordDate, Long> {
 
 
-//  @Query("select rd.date from RecordDate rd where rd.date =:date")
-//  void selectDate(@Param("date") LocalDate date);
   Optional<RecordDate> findByDate(LocalDate date);
 
   @Modifying
   @Query("update RecordDate rd set rd.routine.routineNum = :routine where rd.date = :date ")
   void updateDate(@Param("routine") Long routine, @Param("date")  LocalDate date);
+
+  @Query("select rd.date from RecordDate rd where rd.siteUser.username = :username")
+  List<LocalDate> selectDate(@Param("username") String username);
+
+
+
+
+
+
 }
