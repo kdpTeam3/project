@@ -30,8 +30,8 @@ public class RecordDate {
   @Column(name = "workout_completed")
   private Boolean workoutCompleted;
 
-  @NotNull
   @ManyToOne
+  @OnDelete(action = OnDeleteAction.SET_NULL)
   @JoinColumn(name = "routine_id", referencedColumnName = "routineNum")
   private Routine routine;
 
