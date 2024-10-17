@@ -211,7 +211,8 @@ public class WorkoutController {
 
       if (recordDateRepository.findByDate(LocalDate.parse(routineUpdateDto.getDate()))
           .isPresent()) {
-        recordDateRepository.updateDate(routine.getRoutineNum(), LocalDate.parse(routineUpdateDto.getDate()));
+        recordDateRepository.updateDate(routine.getRoutineNum(),
+            LocalDate.parse(routineUpdateDto.getDate()));
       } else {
 
         RecordDate recordDate = new RecordDate();
@@ -245,16 +246,19 @@ public class WorkoutController {
   @DeleteMapping("/delete/{id}")
   public ResponseEntity<String> deleteRoutine(@PathVariable("id") Long id, Principal principal) {
     Optional<Routine> optionalRoutine = this.routineRepository.findById(id);
-
+    System.out.println(1);
     if (optionalRoutine.isPresent()) {
+      System.out.println(2);
       Routine routine = optionalRoutine.get();
 
       // 현재 로그인한 사용자가 루틴의 소유자인지 확인
       if (!routine.getSiteUser().getUsername().equals(principal.getName())) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body("삭제할 권한이 없습니다");
       }
-
-      this.routineRepository.delete(routine);
+      System.out.println("try");
+      System.out.println("routineNum : " + routine.getRoutineNum());
+      this.routineRepository.deleteById(routine.getRoutineNum());
+      System.out.println("fail");
       return ResponseEntity.ok("루틴이 성공적으로 삭제되었습니다.");
     } else {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body("루틴을 찾을 수 없습니다.");
@@ -283,7 +287,12 @@ public class WorkoutController {
     model.addAttribute("routines", routines);
     model.addAttribute("completedDates", completedDates);
 
-    return "my_goal";
+    if (routines.size() > 0) {
+
+      return "my_goal";
+    }else{
+      return "redirect:my_routine"; // 리다이렉션
+    }
   }
 
   @PreAuthorize("isAuthenticated()")
