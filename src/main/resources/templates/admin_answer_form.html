@@ -1,13 +1,18 @@
 <!DOCTYPE html>
-<html layout:decorate="~{layout}">
-<div layout:fragment="content" class="container my-3">
-    <h2 class="mb-4">답변 수정</h2>
-    <form th:action="@{|/manage/answer/modify/${answer.id}|}" method="post">
-        <div class="mb-3">
-            <label for="content" class="form-label">답변 내용</label>
-            <textarea id="content" name="content" th:text="${answer.content}" class="form-control" rows="10"></textarea>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+    <head>
+        <title>답변 수정</title>
+    </head>
+    <body>
+        <div layout:fragment="content" class="container my-3">
+            <h2 class="mb-4">답변 수정</h2>
+            <form th:action="@{|/manage/answer/modify/${answer.id}|}" th:object="${answer}" method="post">
+                <div class="mb-3">
+                    <label for="content" class="form-label">답변 내용</label>
+                    <textarea id="content" th:field="*{content}" class="form-control" rows="10"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">수정하기</button>
+            </form>
         </div>
-        <input type="submit" value="수정하기" class="btn btn-primary">
-    </form>
-</div>
+    </body>
 </html>
