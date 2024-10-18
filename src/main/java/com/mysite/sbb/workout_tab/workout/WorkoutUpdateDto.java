@@ -22,5 +22,4 @@ public class WorkoutUpdateDto {
         this.workout_name = workout_name;
         this.workoutSet = workoutSet;
     }
-
 }

@@ -11,7 +11,7 @@ public class WorkoutSet {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long workoutSetNum;
 
     @NotNull
     @ManyToOne
