@@ -3,6 +3,9 @@ package com.mysite.sbb.user;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -78,5 +81,10 @@ public class UserService {
 
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
+    }
+
+    public Page<SiteUser> getPaginatedUsers(int page) {
+        Pageable pageable = PageRequest.of(page, 10); // 페이지당 10개의 항목
+        return userRepository.findAll(pageable);
     }
 }

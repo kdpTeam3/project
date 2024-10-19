@@ -1,0 +1,64 @@
+#home > div.container.my-5 > div > div {
+  background-color: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(5px);
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.pagination-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+}
+.pagination-wrapper {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+}
+.pagination {
+  display: flex;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.pagination .page-item .page-link {
+  background-color: transparent;
+  border: 1px solid #cccccc;
+  color: #cccccc;
+  margin: 0 2px;
+  padding: 5px 10px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+.pagination .page-item.active .page-link {
+  background-color: rgba(33, 37, 41);
+  color: #cccccc;
+}
+.pagination .page-item .page-link:hover {
+  background-color: rgba(33, 37, 41);
+  color: #cccccc;
+}
+.custom-btn.bordered {
+  background-color: rgba(33, 37, 41);
+  border: 1px solid rgba(33, 37, 41);
+  color: #cccccc;
+  padding: 5px 10px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+.custom-btn.bordered:hover {
+  background-color: rgba(33, 37, 41);
+  border-color: rgba(33, 37, 41);
+}
+.table {
+  border-color: #666666;
+}
+.table thead th {
+  border-color: #666666;
+}
+.table td,
+.table th {
+  border-color: #666666;
+}

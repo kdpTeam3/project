@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.mysite.sbb.answer.Answer;
+import com.mysite.sbb.answer.AnswerForm;
 import com.mysite.sbb.answer.AnswerService;
 import com.mysite.sbb.question.Question;
 import com.mysite.sbb.question.QuestionForm;
@@ -38,9 +39,9 @@ public class AdminController {
     private final AnswerService answerService;
 
     @GetMapping("")
-    public String adminPage(Model model) {
-        List<SiteUser> users = userService.getAllUsers();
-        model.addAttribute("users", users);
+    public String adminPage(Model model, @RequestParam(value = "page", defaultValue = "0") int page) {
+        Page<SiteUser> paging = userService.getPaginatedUsers(page);
+        model.addAttribute("paging", paging);
         return "admin_page";
     }
 
@@ -114,14 +115,19 @@ public class AdminController {
     @GetMapping("/answer/modify/{id}")
     public String answerModify(@PathVariable("id") Integer id, Model model) {
         Answer answer = answerService.getAnswer(id);
-        model.addAttribute("answer", answer);
-        return "admin_answer_form";
+        AnswerForm answerForm = new AnswerForm();
+        answerForm.setContent(answer.getContent());
+        model.addAttribute("answerForm", answerForm);
+        return "answer_form";
     }
 
     @PostMapping("/answer/modify/{id}")
-    public String answerModify(@PathVariable("id") Integer id, @RequestParam String content) {
+    public String answerModify(@PathVariable("id") Integer id, @Valid AnswerForm answerForm, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return "answer_form";
+        }
         Answer answer = answerService.getAnswer(id);
-        answerService.modify(answer, content);
+        answerService.modify(answer, answerForm.getContent());
         return "redirect:/manage/answer/list";
     }
 
