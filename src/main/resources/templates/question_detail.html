@@ -138,6 +138,16 @@
               </div>
               <div class="action-buttons">
                 <a
+                  th:if="${question.author != null and @messageController.createEncryptedMessageUrl(question.author.username) != null}"
+                  th:href="@{${@messageController.createEncryptedMessageUrl(question.author.username)}}"
+                >
+                  <img
+                    th:src="@{/static/images/message.png}"
+                    class="message-icon"
+                    alt="메시지 보내기"
+                  />
+                </a>
+                <a
                   th:href="@{|/question/modify/${question.id}|}"
                   class="btn btn-custom"
                   sec:authorize="isAuthenticated()"
@@ -179,8 +189,8 @@
               </div>
               <div class="action-buttons">
                 <a
-                  th:href="${@messageController.createEncryptedMessageUrl(answer.author.username)}"
-                  th:if="${answer.author != null}"
+                  th:if="${question.author != null and @messageController.createEncryptedMessageUrl(answer.author.username) != null}"
+                  th:href="@{${@messageController.createEncryptedMessageUrl(answer.author.username)}}"
                 >
                   <img
                     th:src="@{/static/images/message.png}"

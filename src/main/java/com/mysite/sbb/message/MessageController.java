@@ -32,6 +32,15 @@ public class MessageController {
         return new String();
     }
 
+    public String createEncryptedMessageUrl(String username) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.getName().equals(username)) {
+            return null; // 자기 자신인 경우 null 반환
+        }
+        String encryptedUsername = encryptionUtil.encrypt(username);
+        return "/messages?encryptedReceiverName=" + encryptedUsername;
+    }
+
     @GetMapping("/messages")
     public String messageForm(
             @RequestParam(name = "encryptedReceiverName", required = false) String encryptedReceiverName,
@@ -105,9 +114,15 @@ public class MessageController {
     public String sendMessage(
             @RequestParam(name = "encryptedReceiverName", required = false) String encryptedReceiverName,
             @RequestParam(name = "receiverName", required = false) String receiverName,
-            @RequestParam(name = "content") String content,
-            @RequestParam(name = "principal", required = false) Principal principal) {
+            @RequestParam(name = "content") String content) {
         try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication == null || !authentication.isAuthenticated()) {
+                return "redirect:/user/login";
+            }
+
+            String senderUsername = authentication.getName();
+
             if (encryptedReceiverName != null) {
                 receiverName = encryptionUtil.decrypt(encryptedReceiverName);
             }
@@ -116,7 +131,7 @@ public class MessageController {
                 return "error/400";
             }
 
-            SiteUser sender = userService.findByUsername(principal.getName());
+            SiteUser sender = userService.findByUsername(senderUsername);
             SiteUser receiver = userService.findByUsername(receiverName);
             if (receiver == null) {
                 return "error/404";
@@ -129,10 +144,14 @@ public class MessageController {
     }
 
     @GetMapping("/messages/chat/{receiverId}")
-    public String initiateChat(@PathVariable(name = "receiverId") Long receiverId,
-            @RequestParam(name = "principal", required = false) Principal principal,
-            @RequestParam(name = "model", required = false) Model model) {
-        SiteUser sender = userService.findByUsername(principal.getName());
+    public String initiateChat(@PathVariable(name = "receiverId") Long receiverId, Model model) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return "redirect:/user/login";
+        }
+
+        String senderUsername = authentication.getName();
+        SiteUser sender = userService.findByUsername(senderUsername);
         SiteUser receiver = userService.getUserById(receiverId);
 
         boolean hasMessageHistory = messageService.hasMessageHistory(sender, receiver);
@@ -145,14 +164,5 @@ public class MessageController {
         model.addAttribute("receiver", receiver);
         model.addAttribute("chatUrl", "/chat/" + receiverId);
         return "chat/chat_room";
-    }
-
-    public String createEncryptedMessageUrl(@RequestParam(name = "receiverName") String receiverName) {
-        try {
-            String encryptedReceiverName = encryptionUtil.encrypt(receiverName);
-            return "/messages?encryptedReceiverName=" + encryptedReceiverName;
-        } catch (EncryptionUtil.EncryptionException e) {
-            return "/messages";
-        }
     }
 }
