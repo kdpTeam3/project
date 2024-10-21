@@ -80,9 +80,7 @@ input.form-control {
 .tab-pane ul li {
   cursor: pointer; /* 마우스를 올렸을 때 포인터 커서로 변경 */
   padding: 10px; /* 패딩 추가 */
-  transition:
-    background-color 0.3s,
-    color 0.3s; /* 부드러운 전환 효과 */
+  transition: background-color 0.3s, color 0.3s; /* 부드러운 전환 효과 */
   border-radius: 4px; /* 모서리 둥글게 */
 }
 
@@ -91,4 +89,9 @@ input.form-control {
   background-color: #f0f0f0; /* 배경색 변경 */
   color: #007bff; /* 텍스트 색상 변경 */
   font-weight: bold; /* 텍스트 두껍게 */
+}
+
+
+.hidden {
+  display: none;
 }
