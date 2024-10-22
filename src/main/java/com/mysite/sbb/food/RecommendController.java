@@ -25,9 +25,9 @@ public class RecommendController {
     // 프로필 여부 확인 후 페이지 리다이렉트
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/check_profile")
-    public String checkProfileAndRedirect(@RequestParam("user_id") String userId) {
+    public String checkProfileAndRedirect(@RequestParam("username") String userId) {
         try {
-            String response = restClientService.sendPostRequest("/check_profile", "user_id=" + userId);
+            String response = restClientService.sendPostRequest("/check_profile", "username=" + userId);
             Map<String, Object> result = restClientService.parseJsonToMap(response);
 
             // 프로필 존재 여부에 따라 페이지 리다이렉트
@@ -51,13 +51,13 @@ public class RecommendController {
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/recommend")
-    public String getRecommendations(@RequestParam("user_id") String userId, Model model) {
+    public String getRecommendations(@RequestParam("username") String userId, Model model) {
         try {
-            String response = restClientService.sendPostRequest("/recommend", "user_id=" + userId);
+            String response = restClientService.sendPostRequest("/recommend", "username=" + userId);
             Map<String, Object> recommendations = restClientService.parseJsonToMap(response);
 
             model.addAttribute("recommendations", recommendations);
-            model.addAttribute("user_id", userId);
+            model.addAttribute("username", userId);
         } catch (Exception e) {
             e.printStackTrace(); // 오류 발생 시 처리
         }
@@ -66,7 +66,7 @@ public class RecommendController {
 
     @PostMapping("/submit_rating")
     public String submitRating(
-        @RequestParam("user_id") String userId,
+        @RequestParam("username") String userId,
         @RequestParam("lunch_food_code[]") String[] lunchFoodCodes,
         @RequestParam("lunch_food_number[]") String[] lunchFoodNumbers,
         @RequestParam("lunch_rating[]") String[] lunchRatings,
@@ -83,7 +83,7 @@ public class RecommendController {
     // 평점 제출 요청 바디 빌드
     private String buildRatingRequestBody(String userId, String[] lunchFoodCodes, String[] lunchFoodNumbers, String[] lunchRatings,
                                           String[] dinnerFoodCodes, String[] dinnerFoodNumbers, String[] dinnerRatings) {
-        StringBuilder requestBody = new StringBuilder("user_id=" + userId);
+        StringBuilder requestBody = new StringBuilder("username=" + userId);
 
         appendFoodDetails(requestBody, "lunch_food_code[]", lunchFoodCodes);
         appendFoodDetails(requestBody, "lunch_food_number[]", lunchFoodNumbers);

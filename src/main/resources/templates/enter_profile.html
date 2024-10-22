@@ -27,7 +27,7 @@
         <div class="profile-container">
             <h1>유저 프로필 입력</h1>
             <form action="/food/save_profile" method="post">
-                <input type="hidden" name="user_id" th:value="${#authentication.name}">
+                <input type="hidden" name="username" th:value="${#authentication.name}">
 
                 <!-- 만 나이, 신장, 체중 입력 필드 -->
                 <div class="form-group">
@@ -82,6 +82,7 @@
     </div>
 
     <!-- Bootstrap 및 Popper.js -->
+    <script src="../static/js/jquery.min.js"></script>
     <script src="../static/popper.min.js"></script>
     <script src="../static/bootstrap.min.js"></script>
 </body>

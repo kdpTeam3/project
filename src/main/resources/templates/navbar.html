@@ -29,7 +29,7 @@
                     <ul class="dropdown-menu dropdown-menu-dark">
                         <li>
                             <form id="recommendForm" action="/food/check_profile" method="POST">
-                                <input type="hidden" name="user_id" th:value="${#authentication.name}" />
+                                <input type="hidden" name="username" th:value="${#authentication.name}" />
                                 <button class="dropdown-item" type="submit">식단 추천</button>
                             </form>
                         </li>

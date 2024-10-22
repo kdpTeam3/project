@@ -36,7 +36,7 @@ public class UserProfilecontroller {
     // 유저 프로필 저장 요청 처리
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/save_profile")
-    public String saveUserProfile(@RequestParam("user_id") String userId,
+    public String saveUserProfile(@RequestParam("username") String userId,
                                   @RequestParam("age") int age,
                                   @RequestParam("height") float height,
                                   @RequestParam("weight") float weight,
@@ -51,13 +51,13 @@ public class UserProfilecontroller {
         restClientService.sendPostRequest("/save_profile", requestBody);
 
         // 성공적으로 저장한 후 추천 페이지로 리다이렉트
-        redirectAttributes.addAttribute("user_id", userId);
+        redirectAttributes.addAttribute("username", userId);
         return "redirect:/food/recommend";
     }
 
     // 프로필 정보 및 카테고리 요청 바디 생성 메서드
     private String buildUserProfileRequestBody(String userId, int age, float height, float weight, String gender, List<Integer> preferredCategories) {
-        StringBuilder requestBody = new StringBuilder("user_id=" + userId)
+        StringBuilder requestBody = new StringBuilder("username=" + userId)
                 .append("&age=").append(age)
                 .append("&height=").append(height)
                 .append("&weight=").append(weight)
