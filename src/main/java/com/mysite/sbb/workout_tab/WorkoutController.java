@@ -32,6 +32,7 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Local;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -283,12 +284,15 @@ public class WorkoutController {
     // 사용자의 운동 완료 날짜 리스트 가져오기
     List<LocalDate> completedDates = recordDateRepository.selectDate(principal.getName());
 
+
+    List<Object[]> completedDateRoutines = recordDateRepository.selectRoutine(principal.getName());
+
     // 모델에 추가
     model.addAttribute("routines", routines);
     model.addAttribute("completedDates", completedDates);
+    model.addAttribute("completedDateRoutines", completedDateRoutines);
 
     if (routines.size() > 0) {
-
       return "my_goal";
     }else{
       return "redirect:my_routine"; // 리다이렉션

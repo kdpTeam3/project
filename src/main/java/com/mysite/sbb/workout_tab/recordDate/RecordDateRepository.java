@@ -23,6 +23,10 @@ public interface RecordDateRepository extends JpaRepository<RecordDate, Long> {
   @Query("select rd.date from RecordDate rd where rd.siteUser.username = :username")
   List<LocalDate> selectDate(@Param("username") String username);
 
+  @Query("select rd.date, rd.routine.routine_name from RecordDate rd where rd.siteUser.username = :username")
+  List<Object[]> selectRoutine(@Param("username") String username);
+
+
 
 
 
