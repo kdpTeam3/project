@@ -118,7 +118,7 @@ public class QuestionController {
 
 		}
 		this.questionService.delete(question);
-		return "redirect:/";
+		return "redirect:/question/list";
 	}
 
 }

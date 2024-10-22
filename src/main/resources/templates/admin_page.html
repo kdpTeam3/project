@@ -61,6 +61,7 @@
                     <tr
                       class="text-center"
                       th:each="user, loop : ${paging.content}"
+                      th:if="${user.username != 'admin'}"
                     >
                       <td
                         th:text="${paging.totalElements - (paging.number * paging.size) - loop.index}"
