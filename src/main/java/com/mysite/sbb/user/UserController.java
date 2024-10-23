@@ -83,9 +83,6 @@ public class UserController {
     public String userModifyForm(UserModifyForm userModifyForm, Principal principal, Model model) {
         SiteUser siteUser = this.userService.getUser(principal.getName());
 
-        // 로그로 Principal 확인
-        System.out.println("Logged in user: " + principal.getName());
-
         if (siteUser == null) {
             model.addAttribute("errorMessage", "사용자 정보를 찾을 수 없습니다.");
             return "redirect:/user/login";

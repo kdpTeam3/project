@@ -1,7 +1,6 @@
 package com.mysite.sbb.user;
 
 import java.security.Principal;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -122,7 +121,8 @@ public class AdminController {
     }
 
     @PostMapping("/answer/modify/{id}")
-    public String answerModify(@PathVariable("id") Integer id, @Valid AnswerForm answerForm, BindingResult bindingResult) {
+    public String answerModify(@PathVariable("id") Integer id, @Valid AnswerForm answerForm,
+            BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return "answer_form";
         }

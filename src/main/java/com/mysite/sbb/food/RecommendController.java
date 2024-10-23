@@ -46,7 +46,7 @@ public class RecommendController {
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/recommend")
     public String showRecommendationPage() {
-        return "food_recommend";  // 추천 페이지 템플릿을 반환
+        return "food_recommend"; // 추천 페이지 템플릿을 반환
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -66,23 +66,25 @@ public class RecommendController {
 
     @PostMapping("/submit_rating")
     public String submitRating(
-        @RequestParam("username") String userId,
-        @RequestParam("lunch_food_code[]") String[] lunchFoodCodes,
-        @RequestParam("lunch_food_number[]") String[] lunchFoodNumbers,
-        @RequestParam("lunch_rating[]") String[] lunchRatings,
-        @RequestParam("dinner_food_code[]") String[] dinnerFoodCodes,
-        @RequestParam("dinner_food_number[]") String[] dinnerFoodNumbers,
-        @RequestParam("dinner_rating[]") String[] dinnerRatings) {
+            @RequestParam("username") String userId,
+            @RequestParam("lunch_food_code[]") String[] lunchFoodCodes,
+            @RequestParam("lunch_food_number[]") String[] lunchFoodNumbers,
+            @RequestParam("lunch_rating[]") String[] lunchRatings,
+            @RequestParam("dinner_food_code[]") String[] dinnerFoodCodes,
+            @RequestParam("dinner_food_number[]") String[] dinnerFoodNumbers,
+            @RequestParam("dinner_rating[]") String[] dinnerRatings) {
 
-        String requestBody = buildRatingRequestBody(userId, lunchFoodCodes, lunchFoodNumbers, lunchRatings, dinnerFoodCodes, dinnerFoodNumbers, dinnerRatings);
+        String requestBody = buildRatingRequestBody(userId, lunchFoodCodes, lunchFoodNumbers, lunchRatings,
+                dinnerFoodCodes, dinnerFoodNumbers, dinnerRatings);
 
         restClientService.sendPostRequest("/submit_rating", requestBody);
         return "redirect:/"; // 평점 제출 후 메인 페이지로 리다이렉트
     }
 
     // 평점 제출 요청 바디 빌드
-    private String buildRatingRequestBody(String userId, String[] lunchFoodCodes, String[] lunchFoodNumbers, String[] lunchRatings,
-                                          String[] dinnerFoodCodes, String[] dinnerFoodNumbers, String[] dinnerRatings) {
+    private String buildRatingRequestBody(String userId, String[] lunchFoodCodes, String[] lunchFoodNumbers,
+            String[] lunchRatings,
+            String[] dinnerFoodCodes, String[] dinnerFoodNumbers, String[] dinnerRatings) {
         StringBuilder requestBody = new StringBuilder("username=" + userId);
 
         appendFoodDetails(requestBody, "lunch_food_code[]", lunchFoodCodes);

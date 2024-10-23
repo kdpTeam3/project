@@ -37,12 +37,12 @@ public class UserProfilecontroller {
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/save_profile")
     public String saveUserProfile(@RequestParam("username") String userId,
-                                  @RequestParam("age") int age,
-                                  @RequestParam("height") float height,
-                                  @RequestParam("weight") float weight,
-                                  @RequestParam("gender") String gender,  // 성별 추가
-                                  @RequestParam(value = "preferredCategories", required = false) List<Integer> preferredCategories,
-                                  RedirectAttributes redirectAttributes) {
+            @RequestParam("age") int age,
+            @RequestParam("height") float height,
+            @RequestParam("weight") float weight,
+            @RequestParam("gender") String gender, // 성별 추가
+            @RequestParam(value = "preferredCategories", required = false) List<Integer> preferredCategories,
+            RedirectAttributes redirectAttributes) {
 
         // 프로필 정보 생성
         String requestBody = buildUserProfileRequestBody(userId, age, height, weight, gender, preferredCategories);
@@ -56,7 +56,8 @@ public class UserProfilecontroller {
     }
 
     // 프로필 정보 및 카테고리 요청 바디 생성 메서드
-    private String buildUserProfileRequestBody(String userId, int age, float height, float weight, String gender, List<Integer> preferredCategories) {
+    private String buildUserProfileRequestBody(String userId, int age, float height, float weight, String gender,
+            List<Integer> preferredCategories) {
         StringBuilder requestBody = new StringBuilder("username=" + userId)
                 .append("&age=").append(age)
                 .append("&height=").append(height)

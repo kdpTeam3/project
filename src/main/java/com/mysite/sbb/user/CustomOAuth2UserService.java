@@ -3,7 +3,6 @@ package com.mysite.sbb.user;
 import java.util.Collections;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -18,7 +17,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private UserService userService;
 
-    @Autowired
     public CustomOAuth2UserService(@Lazy UserService userService) {
         this.userService = userService;
     }
