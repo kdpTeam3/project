@@ -1,20 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" type="text/css" th:href="@{/bootstrap.min.css}">
-    <!-- Custom CSS -->
-    <link rel="stylesheet" type="text/css" th:href="@{/style.css}">
-
-    <title>가슴 운동</title>
-</head>
-<body>
-
-<nav th:fragment="second_navbarFragment">
-    <ul class="nav justify-content-center">
+<nav class="second-navbar" th:fragment="second_navbarFragment">
+    <ul class="nav">
         <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="/workout/guide/chest">가슴</a>
+            <a class="nav-link" aria-current="page" href="/workout/guide/chest">가슴</a>
         </li>
         <li class="nav-item">
             <a class="nav-link" href="/workout/guide/triceps">삼두</a>
@@ -36,8 +23,3 @@
         </li>
     </ul>
 </nav>
-
-<script th:src="@{/popper.min.js}"></script> <!-- Popper.js 추가 -->
-<script th:src="@{/bootstrap.min.js}"></script> <!-- Bootstrap JS 추가 -->
-</body>
-</html>

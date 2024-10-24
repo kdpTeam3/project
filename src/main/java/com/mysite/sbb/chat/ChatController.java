@@ -33,7 +33,7 @@ public class ChatController {
 
         model.addAttribute("sender", sender);
         model.addAttribute("receiver", receiver);
-        model.addAttribute("receiverUsername", receiver.getUsername());
+        // model.addAttribute("receiverUsername", receiver.getUsername());
         model.addAttribute("chatHistory", chatHistory);
 
         return "message/chat_room";

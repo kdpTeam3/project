@@ -19,4 +19,11 @@ public class UserModifyForm {
     @Pattern(regexp = "^[a-zA-Z0-9][a-zA-Z0-9-_.]*@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-_]+(\\.[a-zA-Z0-9-_]+)?$", 
              message = "유효한 이메일 주소를 입력해주세요.")
     private String email;
+
+
+    private String password;
+
+    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,}$",
+            message = "비밀번호는 8자 이상이어야 하며, 영문자, 숫자, 특수문자를 각각 하나 이상 포함해야 합니다.")
+    private String password2;
 }

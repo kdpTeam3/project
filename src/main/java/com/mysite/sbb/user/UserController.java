@@ -1,6 +1,7 @@
 package com.mysite.sbb.user;
 
 import java.security.Principal;
+
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -50,7 +51,14 @@ public class UserController {
             session.removeAttribute("naverEmail");
         } catch (DataIntegrityViolationException e) {
             e.printStackTrace();
-            bindingResult.reject("signupFailed", "이미 등록된 사용자입니다.");
+            String errorMessage = e.getMessage().toLowerCase();
+            if (errorMessage.contains("username")) {
+                bindingResult.rejectValue("username", "duplicate.username", "이미 사용 중인 사용자명입니다.");
+            } else if (errorMessage.contains("email")) {
+                bindingResult.rejectValue("email", "duplicate.email", "이미 등록된 이메일 주소입니다.");
+            } else {
+                bindingResult.reject("signupFailed", "회원 가입 중 오류가 발생했습니다.");
+            }
             return "signup_form";
         } catch (Exception e) {
             e.printStackTrace();
@@ -74,7 +82,7 @@ public class UserController {
     @GetMapping("/modify")
     public String userModifyForm(UserModifyForm userModifyForm, Principal principal, Model model) {
         SiteUser siteUser = this.userService.getUser(principal.getName());
-        
+
         // 로그로 Principal 확인
         System.out.println("Logged in user: " + principal.getName());
 
@@ -90,14 +98,30 @@ public class UserController {
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/modify")
-    public String userModify(@Valid UserModifyForm userModifyForm, BindingResult bindingResult, Principal principal) {
+    public String userModify(@Valid UserModifyForm userModifyForm,
+            BindingResult bindingResult,
+            Principal principal) {
         if (bindingResult.hasErrors()) {
             return "user_modify_form";
         }
 
+        // 비밀번호 변경을 시도하는 경우에만 검증
+        if (userModifyForm.getPassword() != null && !userModifyForm.getPassword().trim().isEmpty()) {
+            // 비밀번호 확인 검증
+            if (!userModifyForm.getPassword().equals(userModifyForm.getPassword2())) {
+                bindingResult.rejectValue("password2", "passwordInCorrect",
+                        "2개의 비밀번호가 일치하지 않습니다.");
+                return "user_modify_form";
+            }
+        }
+
         SiteUser siteUser = this.userService.getUser(principal.getName());
-        this.userService.modify(siteUser, userModifyForm.getUsername(), userModifyForm.getEmail());
-        return "redirect:/";
+        this.userService.modify(siteUser,
+                userModifyForm.getUsername(),
+                userModifyForm.getEmail(),
+                userModifyForm.getPassword());  // 비밀번호 추가
+
+        return "redirect:/user/info";
     }
 
     @PreAuthorize("isAuthenticated()")

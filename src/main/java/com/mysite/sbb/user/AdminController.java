@@ -1,7 +1,6 @@
 package com.mysite.sbb.user;
 
 import java.security.Principal;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.mysite.sbb.answer.Answer;
+import com.mysite.sbb.answer.AnswerForm;
 import com.mysite.sbb.answer.AnswerService;
 import com.mysite.sbb.question.Question;
 import com.mysite.sbb.question.QuestionForm;
@@ -38,9 +38,12 @@ public class AdminController {
     private final AnswerService answerService;
 
     @GetMapping("")
-    public String adminPage(Model model) {
-        List<SiteUser> users = userService.getAllUsers();
-        model.addAttribute("users", users);
+    public String adminPage(Model model,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "kw", required = false) String kw) {
+        Page<SiteUser> paging = userService.getPaginatedUsers(page, kw);
+        model.addAttribute("paging", paging);
+        model.addAttribute("kw", kw);
         return "admin_page";
     }
 
@@ -57,12 +60,15 @@ public class AdminController {
     }
 
     @GetMapping("/question/list")
-    public String questionList(Model model, @RequestParam(value = "page", defaultValue = "0") int page) {
+    public String questionList(Model model,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "kw", required = false) String kw) {
         try {
             logger.info("Fetching question list for page: {}", page);
-            Page<Question> paging = questionService.getList(page);
+            Page<Question> paging = questionService.getList(page, kw);
             logger.info("Fetched {} questions", paging.getContent().size());
             model.addAttribute("paging", paging);
+            model.addAttribute("kw", kw);
             return "admin_question_list";
         } catch (Exception e) {
             logger.error("Error fetching question list", e);
@@ -98,9 +104,12 @@ public class AdminController {
     }
 
     @GetMapping("/answer/list")
-    public String answerList(Model model, @RequestParam(value = "page", defaultValue = "0") int page) {
-        Page<Answer> paging = answerService.getList(page);
+    public String answerList(Model model,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "kw", required = false) String kw) {
+        Page<Answer> paging = answerService.getList(page, kw);
         model.addAttribute("paging", paging);
+        model.addAttribute("kw", kw);
         return "admin_answer_list";
     }
 
@@ -114,14 +123,21 @@ public class AdminController {
     @GetMapping("/answer/modify/{id}")
     public String answerModify(@PathVariable("id") Integer id, Model model) {
         Answer answer = answerService.getAnswer(id);
-        model.addAttribute("answer", answer);
-        return "admin_answer_form";
+        AnswerForm answerForm = new AnswerForm();
+        answerForm.setContent(answer.getContent());
+        model.addAttribute("answerForm", answerForm);
+        return "answer_form";
     }
 
     @PostMapping("/answer/modify/{id}")
-    public String answerModify(@PathVariable("id") Integer id, @RequestParam String content) {
+    public String answerModify(@PathVariable("id") Integer id,
+            @Valid AnswerForm answerForm,
+            BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return "answer_form";
+        }
         Answer answer = answerService.getAnswer(id);
-        answerService.modify(answer, content);
+        answerService.modify(answer, answerForm.getContent());
         return "redirect:/manage/answer/list";
     }
 

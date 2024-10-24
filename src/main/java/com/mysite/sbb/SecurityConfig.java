@@ -43,8 +43,11 @@ public class SecurityConfig {
             .csrf((csrf) -> csrf
                 .ignoringRequestMatchers(
                     new AntPathRequestMatcher("/h2-console/**"), 
+                    new AntPathRequestMatcher("/food/**"),
                     new AntPathRequestMatcher("/messages/send"),  // 메시지 전송 경로에 대한 CSRF 보호 무시
-                    new AntPathRequestMatcher("/messages/delete/**")  // 메시지 삭제 경로에 대해 CSRF 무시
+                    new AntPathRequestMatcher("/messages/delete/**"),  // 메시지 삭제 경로에 대해 CSRF 무시
+                    new AntPathRequestMatcher("/workout/record_routine")  // 루틴 데이터 저장 경로에 대해 CSRF 무시
+
                 )
             )
             .headers((headers) -> headers
