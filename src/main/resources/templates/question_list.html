@@ -19,6 +19,36 @@
     />
     <script th:src="@{/static/js/jquery.min.js}"></script>
     <title>질문 게시판</title>
+    <style>
+      .select-wrapper {
+        height: 38px;
+        width: 100px;
+      }
+
+      .select-wrapper .form-select {
+        width: 100%;
+        height: 38px;
+        border-radius: 4px 0 0 4px;
+        background-color: rgba(255, 255, 255, 0.1);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 0 10px;
+        margin: 0;
+        display: block;
+        box-sizing: border-box;
+      }
+
+      .select-wrapper .form-select option {
+        background-color: white;
+        color: #333;
+        padding: 8px;
+      }
+
+      /* 옵션에 마우스 올렸을 때의 스타일 */
+      .select-wrapper .form-select option:hover {
+        background-color: #f0f0f0;
+      }
+    </style>
   </head>
   <body>
     <nav th:replace="~{navbar :: navbarFragment}"></nav>
