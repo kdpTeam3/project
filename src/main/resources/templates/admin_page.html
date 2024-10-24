@@ -44,7 +44,11 @@
                     </tr>
                   </thead>
                   <tbody style="color: white">
-                    <tr class="text-center" th:each="user : ${paging}">
+                    <tr
+                      class="text-center"
+                      th:each="user : ${paging}"
+                      th:if="${!user.username.equals('admin')}"
+                    >
                       <td th:text="${user.id}"></td>
                       <td th:text="${user.username}"></td>
                       <td th:text="${user.email}"></td>
