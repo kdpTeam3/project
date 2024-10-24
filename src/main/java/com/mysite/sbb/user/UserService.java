@@ -8,10 +8,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.mysite.sbb.answer.AnswerRepository;
-import com.mysite.sbb.question.QuestionRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,8 +18,6 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final QuestionRepository questionRepository;
-    private final AnswerRepository answerRepository;
 
     // 새 유저를 생성하여 DB에 저장함. PW는 암호화되어 저장된다.
     public SiteUser create(String username, String email, String password) {
@@ -70,6 +64,16 @@ public class UserService {
         siteUser.setUsername(username);
         siteUser.setEmail(email);
         this.userRepository.save(siteUser);
+    }
+
+    public Page<SiteUser> getPaginatedUsers(int page, String kw) {
+        Pageable pageable = PageRequest.of(page, 10);
+
+        if (kw == null || kw.trim().isEmpty()) {
+            return userRepository.findAll(pageable);
+        }
+
+        return userRepository.findByUsernameKeyword(kw, pageable);
     }
 
     // 삭제 시 작성했던 질문과 답변 또한 함께 삭제됨

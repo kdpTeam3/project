@@ -23,44 +23,10 @@
       th:href="@{/static/css/tooplate-gymso-style.css}"
     />
     <style>
-      body,
-      html {
-        height: 100%;
-      }
-      .page-container {
-        display: flex;
-        flex-direction: column;
-        min-height: 100vh;
-      }
-      .hero {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: -1;
-      }
-      .bg-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.7);
-      }
-      .content-wrapper {
-        flex: 1;
-        display: flex;
-        justify-content: center;
-        align-items: flex-start;
-        padding: 80px 20px;
-      }
       .content-container {
         background-color: rgba(48, 48, 48, 0.8);
         padding: 20px;
         border-radius: 10px;
-        width: 100%;
-        max-width: 800px;
       }
       .question-container,
       .answer-container {
@@ -70,10 +36,14 @@
         margin-bottom: 15px;
       }
       .question-title {
-        word-wrap: break-word;
-        overflow-wrap: break-word;
         color: white;
         margin-bottom: 15px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2; /* 최대 2줄까지 표시 */
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        word-break: break-all; /* 긴 단어 줄바꿈 */
       }
       .btn-custom {
         background-color: #f13a11;
@@ -86,166 +56,164 @@
       .btn-custom:hover {
         background-color: #d62f0a;
       }
-      .text-muted {
-        color: #aaa !important;
-      }
       .message-icon {
         width: 30px;
         height: 30px;
         vertical-align: middle;
         margin-right: 5px;
       }
-      .answer-form {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-      }
-      .action-buttons {
-        display: flex;
-        align-items: center;
-      }
-      .action-buttons > * {
-        margin-left: 5px;
+      .error-message {
+        color: white;
       }
     </style>
   </head>
   <body>
-    <div class="page-container">
-      <nav th:replace="~{navbar :: navbarFragment}"></nav>
+    <nav th:replace="~{navbar :: navbarFragment}"></nav>
 
-      <div class="hero" id="home">
-        <div class="bg-overlay"></div>
-      </div>
+    <div class="hero" id="home">
+      <div class="bg-overlay"></div>
+      <div class="container content-wrapper">
+        <div class="row justify-content-center">
+          <div class="col-md-10 col-lg-8">
+            <div class="table-container">
+              <!-- 질문 제목 -->
+              <h4 class="question-title" th:text="${question.subject}"></h4>
 
-      <div class="content-wrapper">
-        <div class="content-container">
-          <!-- 질문 제목 -->
-          <h4 class="question-title" th:text="${question.subject}"></h4>
-
-          <!-- 질문 섹션 -->
-          <div class="question-container">
-            <p class="text-white" th:text="${question.content}"></p>
-            <div class="d-flex justify-content-between align-items-center">
-              <div class="text-muted">
-                <span th:text="${question.author.username}"></span> |
-                <span
-                  th:text="${#temporals.format(question.createDate, 'yyyy-MM-dd HH:mm')}"
-                ></span>
-                <span
-                  th:if="${question.modifyDate != null}"
-                  th:text="'| 수정: ' + ${#temporals.format(question.modifyDate, 'yyyy-MM-dd HH:mm')}"
-                ></span>
+              <!-- 질문 내용 -->
+              <div class="question-container">
+                <p class="text-white" th:text="${question.content}"></p>
+                <div class="d-flex justify-content-between align-items-center">
+                  <div class="text-muted">
+                    <span th:text="${question.author.username}"></span> |
+                    <span
+                      th:text="${#temporals.format(question.createDate, 'yyyy-MM-dd HH:mm')}"
+                    ></span>
+                    <span
+                      th:if="${question.modifyDate != null}"
+                      th:text="'| 수정: ' + ${#temporals.format(question.modifyDate, 'yyyy-MM-dd HH:mm')}"
+                    >
+                    </span>
+                  </div>
+                  <div class="action-buttons">
+                    <!-- 메시지 아이콘 -->
+                    <a
+                      th:if="${question.author != null and @messageController.createEncryptedMessageUrl(question.author.username) != null}"
+                      th:href="@{${@messageController.createEncryptedMessageUrl(question.author.username)}}"
+                    >
+                      <img
+                        th:src="@{/static/images/message.png}"
+                        class="message-icon"
+                        alt="메시지 보내기"
+                      />
+                    </a>
+                    <!-- 수정/삭제 버튼 -->
+                    <a
+                      th:href="@{|/question/modify/${question.id}|}"
+                      class="btn btn-sm btn-primary"
+                      sec:authorize="isAuthenticated()"
+                      th:if="${question.author != null and #authentication.name == question.author.username}"
+                      >수정</a
+                    >
+                    <a
+                      href="javascript:void(0);"
+                      th:data-uri="@{|/question/delete/${question.id}|}"
+                      class="delete btn btn-sm btn-danger"
+                      sec:authorize="isAuthenticated()"
+                      th:if="${question.author != null and #authentication.name == question.author.username}"
+                      >삭제</a
+                    >
+                  </div>
+                </div>
               </div>
-              <div class="action-buttons">
-                <a
-                  th:if="${question.author != null and @messageController.createEncryptedMessageUrl(question.author.username) != null}"
-                  th:href="@{${@messageController.createEncryptedMessageUrl(question.author.username)}}"
-                >
-                  <img
-                    th:src="@{/static/images/message.png}"
-                    class="message-icon"
-                    alt="메시지 보내기"
+
+              <!-- 답변 목록 -->
+              <h5
+                class="text-white my-3"
+                th:text="|${#lists.size(question.answerList)}개의 답변이 있어요|"
+              ></h5>
+              <div
+                class="answer-container"
+                th:each="answer : ${question.answerList}"
+              >
+                <!-- 답변 내용 -->
+                <p class="text-white mb-2" th:text="${answer.content}"></p>
+                <div class="d-flex justify-content-between align-items-center">
+                  <div class="text-muted">
+                    <span th:text="${answer.author.username}"></span> |
+                    <span
+                      th:text="${#temporals.format(answer.createDate, 'yyyy-MM-dd HH:mm')}"
+                    ></span>
+                    <span
+                      th:if="${answer.modifyDate != null}"
+                      th:text="'| 수정: ' + ${#temporals.format(answer.modifyDate, 'yyyy-MM-dd HH:mm')}"
+                    >
+                    </span>
+                  </div>
+                  <div class="action-buttons">
+                    <!-- 메시지 아이콘 -->
+                    <a
+                      th:if="${answer.author != null and @messageController.createEncryptedMessageUrl(answer.author.username) != null}"
+                      th:href="@{${@messageController.createEncryptedMessageUrl(answer.author.username)}}"
+                    >
+                      <img
+                        th:src="@{/static/images/message.png}"
+                        class="message-icon"
+                        alt="메시지 보내기"
+                      />
+                    </a>
+                    <!-- 수정/삭제 버튼 -->
+                    <a
+                      th:href="@{|/answer/modify/${answer.id}|}"
+                      class="btn btn-sm btn-primary"
+                      sec:authorize="isAuthenticated()"
+                      th:if="${answer.author != null and #authentication.name == answer.author.username}"
+                      >수정</a
+                    >
+                    <a
+                      href="javascript:void(0);"
+                      th:data-uri="@{|/answer/delete/${answer.id}|}"
+                      class="delete btn btn-sm btn-danger"
+                      sec:authorize="isAuthenticated()"
+                      th:if="${answer.author != null and #authentication.name == answer.author.username}"
+                      >삭제</a
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <!-- 답변 작성 폼 -->
+              <form
+                th:action="@{|/answer/create/${question.id}|}"
+                th:object="${answerForm}"
+                method="post"
+                class="mt-3"
+              >
+                <div th:replace="~{form_errors :: formErrorsFragment}"></div>
+                <textarea
+                  sec:authorize="isAnonymous()"
+                  disabled
+                  class="form-control"
+                  rows="3"
+                  placeholder="로그인 후 답변을 작성할 수 있습니다."
+                ></textarea>
+                <textarea
+                  sec:authorize="isAuthenticated()"
+                  th:field="*{content}"
+                  class="form-control"
+                  rows="3"
+                  placeholder="답변을 입력해주세요."
+                ></textarea>
+                <div class="d-flex justify-content-end mt-2">
+                  <input
+                    type="submit"
+                    value="답변등록"
+                    class="btn btn-custom"
+                    sec:authorize="isAuthenticated()"
                   />
-                </a>
-                <a
-                  th:href="@{|/question/modify/${question.id}|}"
-                  class="btn btn-custom"
-                  sec:authorize="isAuthenticated()"
-                  th:if="${question.author != null and #authentication.name == question.author.username}"
-                  >수정</a
-                >
-                <a
-                  href="javascript:void(0);"
-                  th:data-uri="@{|/question/delete/${question.id}|}"
-                  class="delete btn btn-custom"
-                  sec:authorize="isAuthenticated()"
-                  th:if="${question.author != null and #authentication.name == question.author.username}"
-                  >삭제</a
-                >
-              </div>
+                </div>
+              </form>
             </div>
           </div>
-
-          <!-- 답변 섹션 -->
-          <h5
-            class="text-white my-3"
-            th:text="|${#lists.size(question.answerList)}개의 답변|"
-          ></h5>
-          <div
-            class="answer-container"
-            th:each="answer : ${question.answerList}"
-          >
-            <p class="text-white mb-2" th:text="${answer.content}"></p>
-            <div class="d-flex justify-content-between align-items-center">
-              <div class="text-muted">
-                <span th:text="${answer.author.username}"></span> |
-                <span
-                  th:text="${#temporals.format(answer.createDate, 'yyyy-MM-dd HH:mm')}"
-                ></span>
-                <span
-                  th:if="${answer.modifyDate != null}"
-                  th:text="'| 수정: ' + ${#temporals.format(answer.modifyDate, 'yyyy-MM-dd HH:mm')}"
-                ></span>
-              </div>
-              <div class="action-buttons">
-                <a
-                  th:if="${question.author != null and @messageController.createEncryptedMessageUrl(answer.author.username) != null}"
-                  th:href="@{${@messageController.createEncryptedMessageUrl(answer.author.username)}}"
-                >
-                  <img
-                    th:src="@{/static/images/message.png}"
-                    class="message-icon"
-                    alt="메시지 보내기"
-                  />
-                </a>
-                <a
-                  th:href="@{/answer/modify/{id}(id=${answer.id})}"
-                  class="btn btn-custom"
-                  sec:authorize="isAuthenticated()"
-                  th:if="${answer.author != null and #authentication.name == answer.author.username}"
-                  >수정</a
-                >
-                <a
-                  href="javascript:void(0);"
-                  th:data-uri="@{/answer/delete/{id}(id=${answer.id})}"
-                  class="delete btn btn-custom"
-                  sec:authorize="isAuthenticated()"
-                  th:if="${answer.author != null and #authentication.name == answer.author.username}"
-                  >삭제</a
-                >
-              </div>
-            </div>
-          </div>
-
-          <!-- 답변 작성 폼 -->
-          <form
-            th:action="@{|/answer/create/${question.id}|}"
-            th:object="${answerForm}"
-            method="post"
-            class="mt-3 answer-form"
-          >
-            <div th:replace="~{form_errors :: formErrorsFragment}"></div>
-            <textarea
-              sec:authorize="isAnonymous()"
-              disabled
-              class="form-control"
-              rows="3"
-              placeholder="로그인 후 답변을 작성할 수 있습니다."
-            ></textarea>
-            <textarea
-              sec:authorize="isAuthenticated()"
-              th:field="*{content}"
-              class="form-control"
-              rows="3"
-              placeholder="답변을 입력해주세요."
-            ></textarea>
-            <input
-              type="submit"
-              value="답변등록"
-              class="btn btn-custom mt-2"
-              sec:authorize="isAuthenticated()"
-            />
-          </form>
         </div>
       </div>
     </div>

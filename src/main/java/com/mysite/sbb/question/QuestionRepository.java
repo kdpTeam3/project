@@ -1,17 +1,14 @@
 package com.mysite.sbb.question;
 
 // 리포지토리 관련
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-// 페이징 관련
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-
 public interface QuestionRepository extends JpaRepository<Question, Integer> {
+
     // 제목 검색
     @Query("select "
             + "distinct q "

@@ -1,13 +1,5 @@
 package com.mysite.sbb.answer;
 
-import com.mysite.sbb.question.Question;
-import com.mysite.sbb.question.QuestionForm;
-import com.mysite.sbb.question.QuestionService;
-import com.mysite.sbb.user.SiteUser;
-import com.mysite.sbb.user.UserService;
-
-import jakarta.validation.Valid;
-
 import java.security.Principal;
 
 import org.springframework.http.HttpStatus;
@@ -19,9 +11,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.mysite.sbb.question.Question;
+import com.mysite.sbb.question.QuestionService;
+import com.mysite.sbb.user.SiteUser;
+import com.mysite.sbb.user.UserService;
+
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RequestMapping("/answer")

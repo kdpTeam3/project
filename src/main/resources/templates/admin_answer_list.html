@@ -22,20 +22,6 @@
     />
     <script th:src="@{/static/js/jquery.min.js}"></script>
     <title>답변 관리</title>
-    <style>
-      .content-wrapper {
-        padding-top: 80px; /* 네비게이션 바의 높이에 따라 조정 */
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-      }
-      .table-container {
-        background-color: rgba(48, 48, 48, 0.7);
-        padding: 20px;
-        border-radius: 10px;
-      }
-    </style>
   </head>
   <body>
     <!-- 네비게이션 바 -->
@@ -45,26 +31,24 @@
       <div class="bg-overlay"></div>
       <div class="container content-wrapper">
         <div class="row justify-content-center">
-          <div class="col-md-12">
+          <div class="col-md-10">
             <div class="table-container">
               <div class="table-responsive">
                 <table class="table">
                   <thead class="table-dark">
                     <tr class="text-center">
-                      <th>번호</th>
-                      <th style="width: 25%">내용</th>
-                      <th style="width: 25%">제목</th>
-                      <th>작성자</th>
-                      <th>작성시간</th>
-                      <th>Actions</th>
+                      <th style="width: 8%">번호</th>
+                      <th style="width: 10%">원문</th>
+                      <th style="width: 30%">답변 내용</th>
+                      <th style="width: 10%">작성자</th>
+                      <th style="width: 20%">작성시간</th>
+                      <th style="width: 20%">Actions</th>
                     </tr>
                   </thead>
                   <tbody style="color: white">
                     <tr class="text-center" th:each="answer : ${paging}">
-                      <td th:text="${answer.id}"></td>
                       <td
-                        class="text-start"
-                        th:text="${#strings.abbreviate(answer.content, 30)}"
+                        th:text="${paging.getTotalElements() - (paging.number * paging.size) - answerStat.index}"
                       ></td>
                       <td>
                         <a
@@ -73,77 +57,82 @@
                           style="color: white"
                         ></a>
                       </td>
-                      <td th:text="${answer.author.username}"></td>
+                      <td
+                        class="text-start"
+                        th:text="${#strings.abbreviate(answer.content, 30)}"
+                      ></td>
+                      <td
+                        th:text="${answer.author != null ? answer.author.username : ''}"
+                      ></td>
                       <td
                         th:text="${#temporals.format(answer.createDate, 'yyyy-MM-dd HH:mm')}"
                       ></td>
-                      <td>
-                        <a
-                          th:href="@{|/manage/answer/modify/${answer.id}|}"
-                          class="btn btn-sm custom-btn bordered"
-                          >수정</a
-                        >
-                        <a
-                          th:href="@{|/manage/answer/delete/${answer.id}|}"
-                          class="btn btn-sm btn-danger"
-                          onclick="return confirm('정말로 이 답변을 삭제하시겠습니까?')"
-                          >삭제</a
-                        >
+                      <td class="text-center">
+                        <div class="d-flex gap-1 justify-content-center">
+                          <a
+                            th:href="@{|/manage/answer/modify/${answer.id}|}"
+                            class="btn btn-sm btn-primary"
+                            >수정</a
+                          >
+                          <a
+                            th:href="@{|/manage/answer/delete/${answer.id}|}"
+                            class="btn btn-sm btn-danger"
+                            onclick="return confirm('정말로 이 답변을 삭제하시겠습니까?')"
+                            >삭제</a
+                          >
+                        </div>
                       </td>
                     </tr>
                   </tbody>
                 </table>
               </div>
 
-              <!-- 페이징 처리 -->
-              <div class="pagination-container">
-                <div class="pagination-wrapper">
-                  <ul class="pagination" th:if="${!paging.isEmpty()}">
-                    <li
-                      class="page-item"
-                      th:classappend="${!paging.hasPrevious} ? 'disabled'"
-                    >
-                      <a
-                        class="page-link"
-                        th:href="@{|?page=${paging.number-1}|}"
-                      >
-                        <span>이전</span>
-                      </a>
-                    </li>
-                    <li
-                      th:each="page : ${#numbers.sequence(0, paging.totalPages-1)}"
-                      th:classappend="${page == paging.number} ? 'active'"
-                      class="page-item"
-                    >
-                      <a
-                        th:text="${page + 1}"
-                        class="page-link"
-                        th:href="@{|?page=${page}|}"
-                      ></a>
-                    </li>
-                    <li
-                      class="page-item"
-                      th:classappend="${!paging.hasNext} ? 'disabled'"
-                    >
-                      <a
-                        class="page-link"
-                        th:href="@{|?page=${paging.number+1}|}"
-                      >
-                        <span>다음</span>
-                      </a>
-                    </li>
-                  </ul>
-                </div>
+              <div class="search-container">
+                <form
+                  th:action="@{/manage/answer/list}"
+                  method="get"
+                  class="search-form"
+                >
+                  <div class="input-wrapper">
+                    <input
+                      type="text"
+                      name="kw"
+                      class="form-control"
+                      th:value="${kw}"
+                      placeholder="내용으로 검색"
+                    />
+                  </div>
+                  <div class="button-wrapper">
+                    <button type="submit" class="btn custom-btn">검색</button>
+                  </div>
+                </form>
               </div>
-              <div class="d-flex justify-content-center mt-4">
-                <a th:href="@{/manage}" class="btn custom-btn bordered mx-2"
-                  >유저 관리</a
-                >
-                <a
-                  th:href="@{/manage/question/list}"
-                  class="btn custom-btn bordered mx-2"
-                  >질문 관리</a
-                >
+
+              <div class="pagination-container" th:if="${!paging.isEmpty()}">
+                <div class="pagination-wrapper">
+                  <a
+                    class="page-link"
+                    th:href="@{|?page=${paging.number-1}&kw=${kw}|}"
+                    th:if="${paging.hasPrevious}"
+                    >이전</a
+                  >
+                  <span
+                    th:each="page: ${#numbers.sequence(0, paging.totalPages-1)}"
+                    th:if="${page >= paging.number-5 and page <= paging.number+5}"
+                  >
+                    <a
+                      th:text="${page + 1}"
+                      class="page-link"
+                      th:href="@{|?page=${page}&kw=${kw}|}"
+                    ></a>
+                  </span>
+                  <a
+                    class="page-link"
+                    th:href="@{|?page=${paging.number+1}&kw=${kw}|}"
+                    th:if="${paging.hasNext}"
+                    >다음</a
+                  >
+                </div>
               </div>
             </div>
           </div>

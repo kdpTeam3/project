@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import com.mysite.sbb.user.SiteUser;
-import com.mysite.sbb.user.UserService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -16,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 public class ChatService {
 
     private final ChatMessageRepository chatMessageRepository;
-    private final UserService userService;
 
     // 메시지 저장
     public void saveMessage(ChatMessage chatMessage) {

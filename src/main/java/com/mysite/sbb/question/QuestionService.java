@@ -24,7 +24,6 @@ public class QuestionService {
     private final QuestionRepository questionRepository;
 
     // getList 추가 레파지토리로 부터 findAll(); 호출 리턴
-
     // 이 리턴은 어디로 가느냐 QuestionController로 이동
     public Page<Question> getList(int page, String kw, String type) {
         List<Sort.Order> sorts = new ArrayList<>();
@@ -42,6 +41,18 @@ public class QuestionService {
         }
 
         return this.questionRepository.findAll(pageable);
+    }
+
+    public Page<Question> getList(int page, String kw) {
+        List<Sort.Order> sorts = new ArrayList<>();
+        sorts.add(Sort.Order.desc("createDate"));
+        Pageable pageable = PageRequest.of(page, 10, Sort.by(sorts));
+
+        if (kw == null || kw.trim().isEmpty()) {
+            return this.questionRepository.findAll(pageable);
+        }
+
+        return this.questionRepository.findBySubjectKeyword(kw, pageable);
     }
 
     // 특정 질문을 ID로 조회하는 메서드

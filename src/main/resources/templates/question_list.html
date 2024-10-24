@@ -1,263 +1,151 @@
 <!DOCTYPE html>
 <html lang="ko">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-        <link rel="stylesheet" type="text/css" th:href="@{/static/css/bootstrap.min.css}" />
-        <link rel="stylesheet" type="text/css" th:href="@{/static/css/style.css}" />
-        <link rel="stylesheet" type="text/css" th:href="@{/static/css/tooplate-gymso-style.css}" />
-        <script th:src="@{/static/js/jquery.min.js}"></script>
-        <title>질문 게시판</title>
-        <style>
-            .content-wrapper {
-                padding-top: 80px;
-                min-height: 100vh;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-            }
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      th:href="@{/static/css/bootstrap.min.css}"
+    />
+    <link rel="stylesheet" type="text/css" th:href="@{/static/css/style.css}" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      th:href="@{/static/css/tooplate-gymso-style.css}"
+    />
+    <script th:src="@{/static/js/jquery.min.js}"></script>
+    <title>질문 게시판</title>
+  </head>
+  <body>
+    <nav th:replace="~{navbar :: navbarFragment}"></nav>
 
-            .table-container {
-                background-color: rgba(48, 48, 48, 0.7);
-                padding: 20px;
-                border-radius: 10px;
-            }
+    <div class="hero" id="home">
+      <div class="bg-overlay"></div>
+      <div class="container content-wrapper">
+        <div class="row justify-content-center">
+          <div class="col-md-10 col-lg-8">
+            <div class="table-container">
+              <div class="table-responsive">
+                <table class="table">
+                  <thead class="table-dark">
+                    <tr class="text-center">
+                      <th>번호</th>
+                      <th style="width: 50%">제목</th>
+                      <th>글쓴이</th>
+                      <th>작성시간</th>
+                    </tr>
+                  </thead>
+                  <tbody style="color: white">
+                    <tr class="text-center" th:each="question, loop: ${paging}">
+                      <td
+                        th:text="${paging.getTotalElements() - (paging.number * paging.size) - loop.index}"
+                      ></td>
+                      <td class="text-start">
+                        <a
+                          th:href="@{|/question/detail/${question.id}|}"
+                          th:text="${#strings.abbreviate(question.subject, 20)}"
+                          style="color: white"
+                        ></a>
+                        <span
+                          class="text-danger small ms-2"
+                          th:if="${#lists.size(question.answerList) > 0}"
+                          th:text="${#lists.size(question.answerList) + '개 답변'}"
+                        ></span>
+                      </td>
+                      <td>
+                        <span
+                          th:if="${question.author != null}"
+                          th:text="${question.author.username}"
+                        ></span>
+                      </td>
+                      <td
+                        th:text="${#temporals.format(question.createDate, 'yyyy-MM-dd HH:mm')}"
+                      ></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
 
-            /* 검색 컨테이너 스타일 수정 */
-            .search-container {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                margin: 20px 0;
-                width: 100%;
-            }
+              <div class="search-container">
+                <form
+                  th:action="@{/question/list}"
+                  method="get"
+                  class="search-form"
+                >
+                  <div class="select-wrapper">
+                    <select name="type" class="form-select">
+                      <option
+                        value="subject"
+                        th:selected="${type == 'subject'}"
+                      >
+                        제목
+                      </option>
+                      <option
+                        value="username"
+                        th:selected="${type == 'username'}"
+                      >
+                        작성자
+                      </option>
+                    </select>
+                  </div>
+                  <div class="input-wrapper">
+                    <input
+                      type="text"
+                      name="kw"
+                      class="form-control"
+                      th:value="${kw != null ? kw : ''}"
+                      placeholder="검색어를 입력하세요"
+                    />
+                  </div>
+                  <div class="button-wrapper">
+                    <button type="submit" class="btn custom-btn">검색</button>
+                  </div>
+                </form>
+              </div>
 
-            .search-form {
-                display: flex;
-                width: 100%;
-                max-width: 400px;
-                gap: 0;
-                height: 38px;
-            }
-
-            .select-wrapper {
-                height: 38px;
-                width: 100px;
-            }
-
-            .select-wrapper .form-select {
-                width: 100%;
-                height: 38px;
-                border-radius: 4px 0 0 4px;
-                background-color: rgba(255, 255, 255, 0.1);
-                color: white;
-                border: 1px solid rgba(255, 255, 255, 0.2);
-                padding: 0 10px;
-                margin: 0;
-                display: block;
-                box-sizing: border-box;
-            }
-
-            .select-wrapper .form-select option {
-                background-color: white;
-                color: #333;
-                padding: 8px;
-            }
-
-            /* 옵션에 마우스 올렸을 때의 스타일 */
-            .select-wrapper .form-select option:hover {
-                background-color: #f0f0f0;
-            }
-
-            .input-wrapper {
-                flex: 1;
-                height: 38px;
-            }
-
-            .input-wrapper .form-control {
-                width: 100%;
-                height: 38px;
-                background-color: rgba(255, 255, 255, 0.1);
-                color: white;
-                border: 1px solid rgba(255, 255, 255, 0.2);
-                border-left: none;
-                border-radius: 0;
-                padding: 0 10px;
-                margin: 0;
-                display: block;
-                box-sizing: border-box;
-            }
-
-            .button-wrapper {
-                height: 38px;
-                width: 80px;
-            }
-
-            .button-wrapper .btn.custom-btn {
-                width: 100%;
-                height: 38px;
-                border-radius: 0 4px 4px 0;
-                background-color: var(--primary-color);
-                color: white;
-                border: none;
-                padding: 0;
-                margin: 0;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                box-sizing: border-box;
-            }
-
-            /* 추가된 리셋 스타일 */
-            .search-form select,
-            .search-form input,
-            .search-form button {
-                appearance: none;
-                -webkit-appearance: none;
-                -moz-appearance: none;
-                line-height: normal;
-            }
-
-            .select-wrapper,
-            .input-wrapper,
-            .button-wrapper {
-                display: flex;
-                align-items: stretch;
-            }
-
-            /* 페이지네이션 컨테이너 중앙 정렬 */
-            .pagination-container {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                gap: 20px;
-                margin-top: 20px;
-            }
-
-            .pagination-wrapper {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                gap: 5px;
-                margin-bottom: 20px;
-            }
-
-            .page-link {
-                background-color: rgba(255, 255, 255, 0.1);
-                border: 1px solid rgba(255, 255, 255, 0.2);
-                color: white;
-                padding: 8px 12px;
-                border-radius: 4px;
-                text-decoration: none;
-            }
-
-            .page-link:hover {
-                background-color: var(--primary-color);
-                border-color: var(--primary-color);
-                color: white;
-            }
-
-            /* 글쓰기 버튼 */
-            .btn.custom-btn.bordered {
-                background-color: var(--primary-color);
-                color: white;
-                border: none;
-                padding: 8px 20px;
-                border-radius: 4px;
-            }
-
-            .btn.custom-btn.bordered:hover {
-                background-color: var(--primary-hover);
-            }
-        </style>
-    </head>
-    <body>
-        <nav th:replace="~{navbar :: navbarFragment}"></nav>
-
-        <div class="hero" id="home">
-            <div class="bg-overlay"></div>
-            <div class="container content-wrapper">
-                <div class="row justify-content-center">
-                    <div class="col-md-10 col-lg-8">
-                        <div class="table-container">
-                            <div class="table-responsive">
-                                <table class="table">
-                                    <thead class="table-dark">
-                                        <tr class="text-center">
-                                            <th>번호</th>
-                                            <th style="width: 50%">제목</th>
-                                            <th>글쓴이</th>
-                                            <th>작성시간</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody style="color: white">
-                                        <tr class="text-center" th:each="question, loop: ${paging}">
-                                            <td th:text="${paging.getTotalElements() - (paging.number * paging.size) - loop.index}"></td>
-                                            <td class="text-start">
-                                                <a
-                                                    th:href="@{|/question/detail/${question.id}|}"
-                                                    th:text="${#strings.abbreviate(question.subject, 20)}"
-                                                    style="color: white"
-                                                ></a>
-                                                <span
-                                                    class="text-danger small ms-2"
-                                                    th:if="${#lists.size(question.answerList) > 0}"
-                                                    th:text="${#lists.size(question.answerList) + '개 답변'}"
-                                                ></span>
-                                            </td>
-                                            <td>
-                                                <span th:if="${question.author != null}" th:text="${question.author.username}"></span>
-                                            </td>
-                                            <td th:text="${#temporals.format(question.createDate, 'yyyy-MM-dd HH:mm')}"></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            <div class="search-container">
-                                <form th:action="@{/question/list}" method="get" class="search-form">
-                                    <div class="select-wrapper">
-                                        <select name="type" class="form-select">
-                                            <option value="subject" th:selected="${type == 'subject'}">제목</option>
-                                            <option value="username" th:selected="${type == 'username'}">작성자</option>
-                                        </select>
-                                    </div>
-                                    <div class="input-wrapper">
-                                        <input
-                                            type="text"
-                                            name="kw"
-                                            class="form-control"
-                                            th:value="${kw != null ? kw : ''}"
-                                            placeholder="검색어를 입력하세요"
-                                        />
-                                    </div>
-                                    <div class="button-wrapper">
-                                        <button type="submit" class="btn custom-btn">검색</button>
-                                    </div>
-                                </form>
-                            </div>
-
-                            <div class="pagination-container">
-                                <div class="pagination-wrapper">
-                                    <a class="page-link" th:href="@{|?page=${paging.number-1}&kw=${kw}&type=${type}|}" th:if="${paging.hasPrevious}">이전</a>
-                                    <span
-                                        th:each="page: ${#numbers.sequence(0, paging.totalPages-1)}"
-                                        th:if="${page >= paging.number-5 and page <= paging.number+5}"
-                                    >
-                                        <a th:text="${page + 1}" class="page-link" th:href="@{|?page=${page}&kw=${kw}&type=${type}|}"></a>
-                                    </span>
-                                    <a class="page-link" th:href="@{|?page=${paging.number+1}&kw=${kw}&type=${type}|}" th:if="${paging.hasNext}">다음</a>
-                                </div>
-                                <a th:href="@{/question/create}" class="btn custom-btn bordered">글쓰기</a>
-                            </div>
-                        </div>
-                    </div>
+              <div class="pagination-container" th:if="${!paging.isEmpty()}">
+                <div class="pagination-wrapper">
+                  <a
+                    class="page-link"
+                    th:href="@{|?page=${paging.number-1}&kw=${kw}&type=${type}|}"
+                    th:if="${paging.hasPrevious}"
+                    >이전</a
+                  >
+                  <span
+                    th:each="page: ${#numbers.sequence(0, paging.totalPages-1)}"
+                    th:if="${page >= paging.number-5 and page <= paging.number+5}"
+                  >
+                    <a
+                      th:text="${page + 1}"
+                      class="page-link"
+                      th:href="@{|?page=${page}&kw=${kw}&type=${type}|}"
+                    ></a>
+                  </span>
+                  <a
+                    class="page-link"
+                    th:href="@{|?page=${paging.number+1}&kw=${kw}&type=${type}|}"
+                    th:if="${paging.hasNext}"
+                    >다음</a
+                  >
                 </div>
+              </div>
+              <div style="text-align: right">
+                <a th:href="@{/question/create}" class="btn custom-btn bordered"
+                  >글쓰기</a
+                >
+              </div>
             </div>
+          </div>
         </div>
+      </div>
+    </div>
 
-        <script src="/static/js/jquery.min.js"></script>
-        <script src="/static/js/popper.min.js"></script>
-        <script src="/static/js/bootstrap.min.js"></script>
-    </body>
+    <script src="/static/js/jquery.min.js"></script>
+    <script src="/static/js/popper.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+  </body>
 </html>
