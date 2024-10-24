@@ -60,9 +60,13 @@ public class UserService {
     }
 
     // 유저의 정보 수정(siteUser의 username, email 항목 수정)
-    public void modify(SiteUser siteUser, String username, String email) {
+    public void modify(SiteUser siteUser, String username, String email, String password) {
         siteUser.setUsername(username);
         siteUser.setEmail(email);
+        // 새 비밀번호가 입력된 경우에만 비밀번호 변경
+        if (password != null && !password.trim().isEmpty()) {
+            siteUser.setPassword(passwordEncoder.encode(password));
+        }
         this.userRepository.save(siteUser);
     }
 

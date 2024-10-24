@@ -110,6 +110,44 @@
               />
             </div>
 
+            <div
+              th:if="${#fields.hasErrors('password')}"
+              class="alert alert-danger"
+              role="alert"
+            >
+              <span th:errors="*{password}"></span>
+            </div>
+            <div class="mb-3">
+              <label for="password" class="form-label"
+                ><strong>새 비밀번호</strong></label
+              >
+              <input
+                type="password"
+                th:field="*{password}"
+                class="form-control"
+                id="password"
+              />
+            </div>
+
+            <div
+              th:if="${#fields.hasErrors('password2')}"
+              class="alert alert-danger"
+              role="alert"
+            >
+              <span th:errors="*{password2}"></span>
+            </div>
+            <div class="mb-3">
+              <label for="password2" class="form-label"
+                ><strong>새 비밀번호 확인</strong></label
+              >
+              <input
+                type="password"
+                th:field="*{password2}"
+                class="form-control"
+                id="password2"
+              />
+            </div>
+
             <button type="submit" class="btn edit-button w-100 mt-3">
               수정하기
             </button>

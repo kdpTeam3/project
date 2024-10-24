@@ -98,14 +98,30 @@ public class UserController {
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/modify")
-    public String userModify(@Valid UserModifyForm userModifyForm, BindingResult bindingResult, Principal principal) {
+    public String userModify(@Valid UserModifyForm userModifyForm,
+            BindingResult bindingResult,
+            Principal principal) {
         if (bindingResult.hasErrors()) {
             return "user_modify_form";
         }
 
+        // 비밀번호 변경을 시도하는 경우에만 검증
+        if (userModifyForm.getPassword() != null && !userModifyForm.getPassword().trim().isEmpty()) {
+            // 비밀번호 확인 검증
+            if (!userModifyForm.getPassword().equals(userModifyForm.getPassword2())) {
+                bindingResult.rejectValue("password2", "passwordInCorrect",
+                        "2개의 비밀번호가 일치하지 않습니다.");
+                return "user_modify_form";
+            }
+        }
+
         SiteUser siteUser = this.userService.getUser(principal.getName());
-        this.userService.modify(siteUser, userModifyForm.getUsername(), userModifyForm.getEmail());
-        return "redirect:/";
+        this.userService.modify(siteUser,
+                userModifyForm.getUsername(),
+                userModifyForm.getEmail(),
+                userModifyForm.getPassword());  // 비밀번호 추가
+
+        return "redirect:/user/info";
     }
 
     @PreAuthorize("isAuthenticated()")
